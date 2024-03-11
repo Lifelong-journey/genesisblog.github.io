@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+  <meta name="description" content="Lab Net前置知识(略)Task: Your Job这个task要求我们补充两个函数。第一个函数是在ring中寻找一个空余位置来放置packet等待传输，第二个函数是遍历整个ring，将传输进来的packet发送给上层协议处理。因为我并没有学过计网，并不十分清楚内部的原理，因此暂时借鉴网友做法，待学成后再作进一步解释和补充。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/2024/02/01/hello-world/index.html">
+<meta property="og:title" content="Lab Net">
+<meta property="og:url" content="http://example.com/2024/03/11/lab%20net/index.html">
 <meta property="og:site_name" content="genesis的空间站">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="Lab Net前置知识(略)Task: Your Job这个task要求我们补充两个函数。第一个函数是在ring中寻找一个空余位置来放置packet等待传输，第二个函数是遍历整个ring，将传输进来的packet发送给上层协议处理。因为我并没有学过计网，并不十分清楚内部的原理，因此暂时借鉴网友做法，待学成后再作进一步解释和补充。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-02-01T09:40:39.004Z">
-<meta property="article:modified_time" content="2024-02-01T09:40:39.004Z">
+<meta property="article:published_time" content="2024-03-11T09:06:29.108Z">
+<meta property="article:modified_time" content="2024-03-11T11:42:06.120Z">
 <meta property="article:author" content="genesis">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2024/02/01/hello-world/">
+<link rel="canonical" href="http://example.com/2024/03/11/lab%20net/">
 
 
 <script id="page-configurations">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>Hello World | genesis的空间站</title>
+  <title>Lab Net | genesis的空间站</title>
   
 
 
@@ -175,7 +175,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/01/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20net/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -188,7 +188,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Hello World
+          Lab Net
         </h1>
 
         <div class="post-meta">
@@ -197,8 +197,9 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2024-02-01 17:40:39" itemprop="dateCreated datePublished" datetime="2024-02-01T17:40:39+08:00">2024-02-01</time>
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:06" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
             </span>
 
           <br>
@@ -207,7 +208,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>367</span>
+              <span>1.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -226,20 +227,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+        <h1 id="Lab-Net"><a href="#Lab-Net" class="headerlink" title="Lab Net"></a>Lab Net</h1><h2 id="前置知识-略"><a href="#前置知识-略" class="headerlink" title="前置知识(略)"></a>前置知识(略)</h2><h2 id="Task-Your-Job"><a href="#Task-Your-Job" class="headerlink" title="Task: Your Job"></a>Task: Your Job</h2><p>这个task要求我们补充两个函数。第一个函数是在ring中寻找一个空余位置来放置packet等待传输，第二个函数是遍历整个ring，将传输进来的packet发送给上层协议处理。因为我并没有学过计网，并不十分清楚内部的原理，因此暂时借鉴网友做法，待学成后再作进一步解释和补充。</p>
+<span id="more"></span>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">int</span><br><span class="line">e1000_transmit(struct mbuf *m)</span><br><span class="line">&#123;</span><br><span class="line">  //</span><br><span class="line">  // Your code here.</span><br><span class="line">  //</span><br><span class="line">  // the mbuf contains an ethernet frame; program it into</span><br><span class="line">  // the TX descriptor ring so that the e1000 sends it. Stash</span><br><span class="line">  // a pointer so that it can be freed after sending.</span><br><span class="line">  //</span><br><span class="line">  acquire(&amp;e1000_lock);</span><br><span class="line">  // 找到ring中下一个放packet的下标</span><br><span class="line">  int idx = regs[E1000_TDT];</span><br><span class="line"></span><br><span class="line">  if ((tx_ring[idx].status &amp; E1000_TXD_STAT_DD) == 0) &#123;</span><br><span class="line">    release(&amp;e1000_lock);</span><br><span class="line">    return -1;</span><br><span class="line">  &#125;</span><br><span class="line">  // 若这个ring未传输完成，那么返回-1</span><br><span class="line"></span><br><span class="line">  if (tx_mbufs[idx])</span><br><span class="line">    mbuffree(tx_mbufs[idx]);</span><br><span class="line">  // 释放掉之前挂载在mbufs上的缓存</span><br><span class="line"></span><br><span class="line">  tx_mbufs[idx] = m;</span><br><span class="line">  // 将新的m挂载上去</span><br><span class="line">  tx_ring[idx].length = m-&gt;len;</span><br><span class="line">  tx_ring[idx].addr = (uint64)m-&gt;head;</span><br><span class="line">  tx_ring[idx].cmd = E1000_TXD_CMD_RS | E1000_TXD_CMD_EOP;</span><br><span class="line">  // 将新的m的数据加载到ring中</span><br><span class="line"></span><br><span class="line">  regs[E1000_TDT] = (idx + 1) % TX_RING_SIZE;</span><br><span class="line">  // 更新ring中下一个放packet的下标，注意取模是因为ring是环形的</span><br><span class="line">  release(&amp;e1000_lock);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">static void</span><br><span class="line">e1000_recv(void)</span><br><span class="line">&#123;</span><br><span class="line">  //</span><br><span class="line">  // Your code here.</span><br><span class="line">  //</span><br><span class="line">  // Check for packets that have arrived from the e1000</span><br><span class="line">  // Create and deliver an mbuf for each packet (using net_rx()).</span><br><span class="line">  //</span><br><span class="line">  for (;;)</span><br><span class="line">  &#123;</span><br><span class="line">    // 现在所有的packet都在memory里面了，我们需要把它们传递到application上去</span><br><span class="line">    int idx = (regs[E1000_RDT] + 1) % RX_RING_SIZE;</span><br><span class="line"></span><br><span class="line">    if ((rx_ring[idx].status &amp; E1000_RXD_STAT_DD) == 0)</span><br><span class="line">      return;</span><br><span class="line">    // 如果没有需要读取的packet，那么就返回</span><br><span class="line"></span><br><span class="line">    rx_mbufs[idx]-&gt;len = rx_ring[idx].length;</span><br><span class="line">    net_rx(rx_mbufs[idx]);</span><br><span class="line">    // 向上传递packet</span><br><span class="line"></span><br><span class="line">    if ((rx_mbufs[idx] = mbufalloc(0)) == 0)</span><br><span class="line">      panic(&quot;e1000 _recv&quot;);</span><br><span class="line">    rx_ring[idx].status = 0;</span><br><span class="line">    rx_ring[idx].addr = (uint64)rx_mbufs[idx]-&gt;head;</span><br><span class="line">    regs[E1000_RDT] = idx;</span><br><span class="line">    // 清空并放置空包</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -253,10 +245,13 @@
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2024/02/01/test/" rel="next" title="test">
-      test <i class="fa fa-chevron-right"></i>
+    <a href="/2024/03/11/lab%20page%20table/" rel="prev" title="Lab Page Table">
+      <i class="fa fa-chevron-left"></i> Lab Page Table
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20mmap/" rel="next" title="Lab Mmap">
+      Lab Mmap <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -316,7 +311,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Lab-Net"><span class="nav-number">1.</span> <span class="nav-text">Lab Net</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86-%E7%95%A5"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识(略)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-Your-Job"><span class="nav-number">1.2.</span> <span class="nav-text">Task: Your Job</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

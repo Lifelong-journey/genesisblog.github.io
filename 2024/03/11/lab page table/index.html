@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Lab Page Table前置知识一、xv6三级page table 原理 在xv6 virtual address中，分为index，offset和EXT三部分。其中offset对标最终翻译后的physical address的后十二位，表示当前4096bit大小的page中的偏移量，而index平分为三个9位索引，分别表示三级PTE中的物理地址偏移量。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lab Page Table">
+<meta property="og:url" content="http://example.com/2024/03/11/lab%20page%20table/index.html">
+<meta property="og:site_name" content="genesis的空间站">
+<meta property="og:description" content="Lab Page Table前置知识一、xv6三级page table 原理 在xv6 virtual address中，分为index，offset和EXT三部分。其中offset对标最终翻译后的physical address的后十二位，表示当前4096bit大小的page中的偏移量，而index平分为三个9位索引，分别表示三级PTE中的物理地址偏移量。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-11T09:06:29.108Z">
+<meta property="article:modified_time" content="2024-03-11T11:42:05.325Z">
+<meta property="article:author" content="genesis">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/03/11/lab%20page%20table/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Lab Page Table | genesis的空间站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">genesis的空间站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-learn">
+
+    <a href="/learn/ln.html" rel="section"><i class="fa fa-cog fa-fw"></i>路漫漫</a>
+
+  </li>
+        <li class="menu-item menu-item-think">
+
+    <a href="/think/" rel="section"><i class="fa fa-snowflake fa-fw"></i>朝闻道</a>
+
+  </li>
+        <li class="menu-item menu-item-write">
+
+    <a href="/write/wt.html" rel="section"><i class="fa fa-ring fa-fw"></i>新世界</a>
+
+  </li>
+        <li class="menu-item menu-item-nothing">
+
+    <a href="/nothing/nt.html" rel="section"><i class="fa fa-fan fa-fw"></i>览星海</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20page%20table/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="genesis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="genesis的空间站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lab Page Table
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:05" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Lab-Page-Table"><a href="#Lab-Page-Table" class="headerlink" title="Lab Page Table"></a>Lab Page Table</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、xv6三级page-table-原理"><a href="#一、xv6三级page-table-原理" class="headerlink" title="一、xv6三级page table 原理"></a>一、xv6三级page table 原理</h3><ol>
+<li>在xv6 virtual address中，分为index，offset和EXT三部分。其中offset对标最终翻译后的physical address的后十二位，表示当前4096bit大小的page中的偏移量，而index平分为三个9位索引，分别表示三级PTE中的物理地址偏移量。<span id="more"></span></li>
+<li>关于page directory，你会发现它只有512个，也就是2的9次方，对应了index中被平分的三级索引。那么如何通过高一级的directory找到低一级的directory呢？其实只需要把上一级的PPN后面加上12个0，就是一个56位物理地址了，这个地址对应的就是下一级的directory，或者说它的第0个元素。那我们不能只找到directory，我们需要找到directory中特定的PTE，那只需要向上移动偏移量个单位就好了。（这就像在一个多层链表中找叶节点一样）当然，最高一级的directory不需要PPN，因为一开始satp就指向了最高一级的directory</li>
+<li>根据上面一级一级翻译，最后得到的PPN后面不需要加12个0，而是加上offset，对应真正page中的4096位（2的十二次方），就是物理地址了。</li>
+<li>PTE中除了PPN，还有一部分flag位。通常有V表示下一级是否合法，RW表示是否读写，U表示是否可以被user权限访问，X表示是否可以被执行等等。</li>
+<li>关于多级page table的作用。如果只有一级的话，那么在初始化process的时候就需要把所有物理地址的page table一次性载入主存，这些page table很大，会一下子占用大量空间。而process并不是一次就会把所有自己的空间都调用一遍，通常情况下只会调用很小一部分，那么最好的方法就是调用哪一部分载入哪一部分的page table。因此三级page table一开始需要载入一个最高级directory（2^9）每次调用时最多加入一个第二级和一个第三级（2^9），而不是一次性加入2^27个PTE，从而大大节约了开销。而cache中的TLB会暂存第一次找到的映射，从而减少重复查找。（注意：当你切换page table时，比如kernel 和 user pt的切换，你需要清空TLB，因为里面暂存的映射对于新的pt不再适用，这在task中有坑）</li>
+</ol>
+<h2 id="Task-Print-a-page-table"><a href="#Task-Print-a-page-table" class="headerlink" title="Task: Print a page table"></a>Task: Print a page table</h2><p>这个task主要让我们熟悉一下三级页表。我们可以运用递归调用_vmprint()来输出每一层的页表。每进入新的一层，我们遍历整个层的页表，如果当前页表合法，我们便取出它的PPN并打印，如果它包含下一层页表，那么就调用_vmprint()进入下一层。</p>
+<p>关于如何判断当前页表是否指向下一层，可看walk与uvmalloc函数，在这两个函数中，如果一个页表含有下一层，它只会设置PTE_V flag，否则就会全设置。</p>
+<p>记得要加入到defs.h中以便被exec调用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">void</span><br><span class="line">_vmprint(pagetable_t pagetable, int level)</span><br><span class="line">&#123;</span><br><span class="line">  for(int i = 0; i &lt; 512; i++)</span><br><span class="line">  &#123;</span><br><span class="line">    pte_t pte = pagetable[i];</span><br><span class="line">    if(pte &amp; PTE_V) &#123; // the PTE is valid 注意：这里运用位运算获取了标志位的二进制值</span><br><span class="line">      uint64 pa = PTE2PA(pte);</span><br><span class="line">      for(int j = 1; j &lt;= level; j++)</span><br><span class="line">        printf(&quot;.. &quot;);</span><br><span class="line">      printf(&quot;%d: pte %p pa %p\n&quot;, i, pte, pa);</span><br><span class="line">      if((pte &amp; (PTE_R|PTE_W|PTE_X)) == 0)// the PTE has a child</span><br><span class="line">        _vmprint((pagetable_t)pa, level + 1);// 注意：若究其根源请移步walk, uvmalloc函数</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void</span><br><span class="line">vmprint(pagetable_t pagetable)</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;page table %p\n&quot;, pagetable);</span><br><span class="line">  _vmprint(pagetable, 1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Task-A-kernel-page-table-per-process"><a href="#Task-A-kernel-page-table-per-process" class="headerlink" title="Task: A kernel page table per process"></a>Task: A kernel page table per process</h2><p>这是一个极难的task，同时它与后面的进程切换课程内容有着密切的联系。建议学习完进程切换相关内容后回看这部分实现。</p>
+<p>在原始的xv6中，所有process共用一个kernel pagetable，这显然是不利于isolation的，因此我们需要给每一个process都添加一个kpagetable。如此，在进行进程切换时用户进程进入内核态的时候就可以直接使用自己的kpagetable，而不是通过walk来模拟MMU寻找物理地址了。</p>
+<ol>
+<li>在proc结构体中加入新的field。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pagetable_t kpagetable;      // new kernel page table</span><br></pre></td></tr></table></figure></li>
+<li>添加kpgtbl映射函数并在初始化的时候为kpgtbl添加映射。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// add a mapping to the per-process page table</span><br><span class="line">// 你会发现mappages可用复用，只需要封装一下就好</span><br><span class="line">void </span><br><span class="line">ukvmmap(pagetable_t ukpagetable, uint64 va, uint64 pa, uint64 sz, int perm)</span><br><span class="line">&#123;</span><br><span class="line">  if(mappages(ukpagetable, va, sz, pa, perm) != 0)</span><br><span class="line">    panic(&quot;ukvmmap&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">// create a direct-map page table</span><br><span class="line">// return nullptr when kalloc fails</span><br><span class="line">pagetable_t</span><br><span class="line">ukvminit()</span><br><span class="line">&#123;</span><br><span class="line">  pagetable_t kpagetable = (pagetable_t) kalloc();//为每个process创建独有的kernel page table</span><br><span class="line">  </span><br><span class="line">  if(kpagetable == 0)</span><br><span class="line">    return kpagetable;</span><br><span class="line"></span><br><span class="line">  memset(kpagetable, 0, PGSIZE);</span><br><span class="line"></span><br><span class="line">  //照搬常数映射</span><br><span class="line">  // uart registers</span><br><span class="line">  ukvmmap(kpagetable, UART0, UART0, PGSIZE, PTE_R | PTE_W);</span><br><span class="line"></span><br><span class="line">  // virtio mmio disk interface</span><br><span class="line">  ukvmmap(kpagetable, VIRTIO0, VIRTIO0, PGSIZE, PTE_R | PTE_W);</span><br><span class="line"></span><br><span class="line">  // CLINT</span><br><span class="line">  ukvmmap(kpagetable, CLINT, CLINT, 0x10000, PTE_R | PTE_W);</span><br><span class="line"></span><br><span class="line">  // PLIC</span><br><span class="line">  ukvmmap(kpagetable, PLIC, PLIC, 0x400000, PTE_R | PTE_W);</span><br><span class="line"></span><br><span class="line">  // map kernel text executable and read-only.</span><br><span class="line">  ukvmmap(kpagetable, KERNBASE, KERNBASE, (uint64)etext-KERNBASE, PTE_R | PTE_X);</span><br><span class="line"></span><br><span class="line">  // map kernel data and the physical RAM we&#x27;ll make use of.</span><br><span class="line">  ukvmmap(kpagetable, (uint64)etext, (uint64)etext, PHYSTOP-(uint64)etext, PTE_R | PTE_W);</span><br><span class="line"></span><br><span class="line">  // map the trampoline for trap entry/exit to</span><br><span class="line">  // the highest virtual address in the kernel.</span><br><span class="line">  ukvmmap(kpagetable, TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_R | PTE_X);</span><br><span class="line">  </span><br><span class="line">  return kpagetable;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// allocproc()</span><br><span class="line">  //为每一个进程分配一个kernel page table</span><br><span class="line">found:</span><br><span class="line"></span><br><span class="line">···</span><br><span class="line"></span><br><span class="line">  p-&gt;kpagetable = ukvminit();</span><br><span class="line">  if(p-&gt;kpagetable == 0)&#123;</span><br><span class="line">    freeproc(p);</span><br><span class="line">    release(&amp;p-&gt;lock);</span><br><span class="line">    return 0;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></li>
+<li>为kernel stack添加映射，但不分配物理页，因为这只是映射，真正的物理页在procinit的时候已经分配了。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// allocproc()</span><br><span class="line">  //仿照procinit中添加kernel stack映射</span><br><span class="line">  uint64 va = KSTACK((int) (p - proc));</span><br><span class="line">  pte_t pa = kvmpa(va);//pa可以直接算</span><br><span class="line">  memset((void*)pa, 0, PGSIZE);// 刷新？</span><br><span class="line">  ukvmmap(p-&gt;kpagetable, va, (uint64)pa, PGSIZE, PTE_R | PTE_W);//加入映射</span><br><span class="line">  p-&gt;kstack = va;</span><br><span class="line"></span><br><span class="line">  // Set up new context to start executing at forkret,</span><br><span class="line">  // which returns to user space.</span><br><span class="line">  memset(&amp;p-&gt;context, 0, sizeof(p-&gt;context)); // 初始化context以保存寄存器状态(进程切换)</span><br><span class="line">  p-&gt;context.ra = (uint64)forkret;</span><br><span class="line">  p-&gt;context.sp = p-&gt;kstack + PGSIZE;</span><br><span class="line"></span><br><span class="line">  return p;</span><br></pre></td></tr></table></figure></li>
+<li>在进程切换调度函数scheduler中，当切换到目标进程内核态时，要切换目标进程的内核页表；当切换回来的时候，要恢复全局内核页表。(注意，为什么我们都设置了进程内核页表却还要切换全局内核页表呢？详情请见后记)<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// scheduler()</span><br><span class="line">        //切换到即将运行的process的kernel page table</span><br><span class="line">        w_satp(MAKE_SATP(p-&gt;kpagetable));</span><br><span class="line">        sfence_vma();</span><br><span class="line">        swtch(&amp;c-&gt;context, &amp;p-&gt;context);</span><br><span class="line"></span><br><span class="line">        // Process is done running for now.</span><br><span class="line">        // It should have changed its p-&gt;state before coming back.</span><br><span class="line">        //当process运行结束后，要切换回全局kernel page table</span><br><span class="line">        kvminithart();</span><br></pre></td></tr></table></figure></li>
+<li>当销毁进程的时候，我们需要回收它的内核页表。我们不需要释放最底层的内核页表的物理地址，只需要释放间接映射的页。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// 取消映射</span><br><span class="line">void</span><br><span class="line">ukvmunmap(pagetable_t pagetable, uint64 va, uint64 npages)</span><br><span class="line">&#123;</span><br><span class="line">  uint64 a;</span><br><span class="line">  pte_t *pte;</span><br><span class="line"></span><br><span class="line">  if((va % PGSIZE) != 0)</span><br><span class="line">    panic(&quot;ukvmunmap: not aligned&quot;);</span><br><span class="line"></span><br><span class="line">  for(a = va; a &lt; va + npages*PGSIZE; a += PGSIZE)&#123;</span><br><span class="line">    if((pte = walk(pagetable, a, 0)) == 0)</span><br><span class="line">      *pte = 0;</span><br><span class="line">    if((*pte &amp; PTE_V) == 0)</span><br><span class="line">      *pte = 0;</span><br><span class="line">    if(PTE_FLAGS(*pte) == PTE_V)</span><br><span class="line">       panic(&quot;ukvmunmap: not a leaf&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//释放页表 注意：最底层的公用物理地址无需释放，因为当我们free pt和kpt时，free pt会清掉物理地址</span><br><span class="line">void</span><br><span class="line">ufreewalk(pagetable_t pagetable)</span><br><span class="line">&#123;</span><br><span class="line">  // there are 2^9 = 512 PTEs in a page table.</span><br><span class="line">  for(int i = 0; i &lt; 512; i++)&#123;</span><br><span class="line">    pte_t pte = pagetable[i];</span><br><span class="line">    if((pte &amp; PTE_V) &amp;&amp; (pte &amp; (PTE_R|PTE_W|PTE_X)) == 0)&#123;</span><br><span class="line">      // this PTE points to a lower-level page table.</span><br><span class="line">      uint64 child = PTE2PA(pte);</span><br><span class="line">      ufreewalk((pagetable_t)child);</span><br><span class="line">      pagetable[i] = 0;</span><br><span class="line">    &#125;</span><br><span class="line">    pagetable[i] = 0;</span><br><span class="line">  &#125;</span><br><span class="line">  kfree((void*)pagetable);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">void</span><br><span class="line">freeprockvm(struct proc *p)</span><br><span class="line">&#123;</span><br><span class="line">  pagetable_t kpagetable = p-&gt;kpagetable;</span><br><span class="line">  // 按分配顺序的逆序来销毁映射, 但不回收物理地址</span><br><span class="line">  ukvmunmap(kpagetable, p-&gt;kstack, PGSIZE/PGSIZE);</span><br><span class="line">  ukvmunmap(kpagetable, TRAMPOLINE, PGSIZE/PGSIZE);</span><br><span class="line">  ukvmunmap(kpagetable, (uint64)etext, (PHYSTOP-(uint64)etext)/PGSIZE);</span><br><span class="line">  ukvmunmap(kpagetable, KERNBASE, ((uint64)etext-KERNBASE)/PGSIZE);</span><br><span class="line">  ukvmunmap(kpagetable, PLIC, 0x400000/PGSIZE);</span><br><span class="line">  ukvmunmap(kpagetable, CLINT, 0x10000/PGSIZE);</span><br><span class="line">  ukvmunmap(kpagetable, VIRTIO0, PGSIZE/PGSIZE);</span><br><span class="line">  ukvmunmap(kpagetable, UART0, PGSIZE/PGSIZE);</span><br><span class="line">  ufreewalk(kpagetable);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// freeproc()</span><br><span class="line">···</span><br><span class="line">  p-&gt;state = UNUSED;</span><br><span class="line">  if(p-&gt;kpagetable) &#123;</span><br><span class="line">    freeprockvm(p);</span><br><span class="line">    p-&gt;kpagetable = 0;</span><br><span class="line">  &#125;</span><br><span class="line">  if(p-&gt;kstack)</span><br><span class="line">    p-&gt;kstack = 0;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="Task-simplify-copyin-copyinstr"><a href="#Task-simplify-copyin-copyinstr" class="headerlink" title="Task: simplify copyin&#x2F;copyinstr"></a>Task: simplify copyin&#x2F;copyinstr</h2><p>这个task是上一个task的后续。因为kpagetable和pagetable前半段映射是一样的，这样的话我们才可以进入内核态后直接运用MMU进行寻址。如果pagetable发生了变化，那么kpagetable也需要发生变化。实验手册提示我们这些变化发生在fork, sbrk, exec中。</p>
+<ol>
+<li>首先我们写一个辅助函数来帮助我们把pagetable复制到kpagetable。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">// vm.c</span><br><span class="line">// 类似mappages来映射</span><br><span class="line">int</span><br><span class="line">umappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)</span><br><span class="line">&#123;</span><br><span class="line">  uint64 a, last;</span><br><span class="line">  pte_t *pte;</span><br><span class="line"></span><br><span class="line">  a = PGROUNDDOWN(va);</span><br><span class="line">  last = PGROUNDDOWN(va + size - 1);</span><br><span class="line">  for(;;)&#123;</span><br><span class="line">    if((pte = walk(pagetable, a, 1)) == 0)</span><br><span class="line">      return -1;</span><br><span class="line">    //if(*pte &amp; PTE_V)//?:能否直接强制复制? // 确实不需要考虑有效位</span><br><span class="line">    //  panic(&quot;remap&quot;);//?:是否需要panic?</span><br><span class="line">    *pte = PA2PTE(pa) | perm | PTE_V;</span><br><span class="line">    if(a == last)</span><br><span class="line">      break;</span><br><span class="line">    a += PGSIZE;</span><br><span class="line">    pa += PGSIZE;</span><br><span class="line">  &#125;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int</span><br><span class="line">pagecopy(pagetable_t old, pagetable_t new, uint64 begin, uint64 end)</span><br><span class="line">&#123;</span><br><span class="line">  pte_t *pte;</span><br><span class="line">  uint64 pa, i;</span><br><span class="line">  uint flags;</span><br><span class="line">  begin = PGROUNDUP(begin);//向上取整到页面边界</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  for(i = begin; i &lt; end; i += PGSIZE)&#123;</span><br><span class="line">    if((pte = walk(old, i, 0)) == 0)</span><br><span class="line">      panic(&quot;pagecopy walk oldpage nullptr&quot;);</span><br><span class="line">    if((*pte &amp; PTE_V) == 0)</span><br><span class="line">      panic(&quot;pagecopy oldpage pte not valid&quot;);</span><br><span class="line">    pa = PTE2PA(*pte);</span><br><span class="line">    flags = PTE_FLAGS(*pte) &amp; (~PTE_U);//标记位设为非user，因为内核模式无法访问PTE_U页面</span><br><span class="line">    //if((mem = kalloc()) == 0)</span><br><span class="line">    //  goto err;</span><br><span class="line">    //memmove(mem, (char*)pa, PGSIZE);//?:无需申请额外的页？ // 后记：确实不需要申请，因为在调用这个函数之前就已经申请了</span><br><span class="line">    if(umappages(new, i, PGSIZE, pa, flags) != 0)&#123;</span><br><span class="line">      //kfree(mem);无需释放</span><br><span class="line">      goto err;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return 0;</span><br><span class="line"></span><br><span class="line"> err:</span><br><span class="line">  uvmunmap(new, begin, (i - begin) / PGSIZE, 0);//最后一位设0表示不释放用户态页表物理空间</span><br><span class="line">  return -1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>修改fork(), exec(), sbrk()和userinit();</li>
+</ol>
+<p>fork()</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//同步pagetable 与 kpagetable</span><br><span class="line">if(pagecopy(np-&gt;pagetable, np-&gt;kpagetable, 0, np-&gt;sz) != 0)&#123;</span><br><span class="line">  freeproc(np);</span><br><span class="line">  release(&amp;np-&gt;lock);</span><br><span class="line">  return -1;</span><br><span class="line">&#125;</span><br><span class="line">np-&gt;parent = p;</span><br></pre></td></tr></table></figure>
+<p>exec()</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//uvmunmap(p-&gt;kpagetable, 0, PGROUNDUP(oldsz)/PGSIZE, 0);//消除旧的映射但不需要</span><br><span class="line">if(pagecopy(p-&gt;pagetable, p-&gt;kpagetable, 0, p-&gt;sz) &lt; 0)//复制page table</span><br><span class="line">  goto bad;</span><br><span class="line"></span><br><span class="line">w_satp(MAKE_SATP(p-&gt;kpagetable));//载入satp寄存器</span><br><span class="line">sfence_vma();//刷新映射</span><br></pre></td></tr></table></figure>
+<p>sbrk()</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">int</span><br><span class="line">growproc(int n)</span><br><span class="line">&#123;</span><br><span class="line">  uint sz;</span><br><span class="line">  struct proc *p = myproc();</span><br><span class="line"></span><br><span class="line">  sz = p-&gt;sz;</span><br><span class="line">  if(n &gt; 0)&#123;</span><br><span class="line">    if(sz + n &gt; PLIC || (sz = uvmalloc(p-&gt;pagetable, sz, sz + n)) == 0) &#123;//不能溢出</span><br><span class="line">      return -1;</span><br><span class="line">    &#125;</span><br><span class="line">    if(pagecopy(p-&gt;pagetable, p-&gt;kpagetable, p-&gt;sz, sz) != 0) &#123;</span><br><span class="line">      return -1;</span><br><span class="line">    &#125;//同步增量</span><br><span class="line">  &#125; else if(n &lt; 0)&#123;</span><br><span class="line">    sz = uvmdealloc(p-&gt;pagetable, sz, sz + n);</span><br><span class="line">    if(sz != p-&gt;sz) &#123;</span><br><span class="line">      uvmunmap(p-&gt;kpagetable, PGROUNDUP(sz), (PGROUNDUP(p-&gt;sz) - PGROUNDUP(sz)) / PGSIZE, 0);</span><br><span class="line">    &#125;//同步缩量</span><br><span class="line">  &#125;</span><br><span class="line">  //ukvminithard(p-&gt;kpagetable);</span><br><span class="line">  p-&gt;sz = sz;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>userinit()</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pagecopy(p-&gt;pagetable, p-&gt;kpagetable, 0, p-&gt;sz);//copy</span><br></pre></td></tr></table></figure>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>关于scheduler全局页表切换，这个问题困惑了我许久，经过大量回看源码与课程笔记最后得以解决，并大大加深了我对于进程切换的理解。<br>首先，scheduler函数不能多开！一个cpu里只能有一个scheduler，不管它是在running，runnable还是别的。(这也是为什么在里面会有死循环)当进程调用它时，不是通过函数调用，而是通过切换context来直接转换，每次它切换到其他进程之前，它的状态都会被保存等待下一次调用。<br>所以，当每次调用scheduler的时候，(除首次以外)都会直接进入上一次调用scheduler的位置(也就是swtch后面)。理所应当，此时应该由调用者的内核页表切换到scheduler的内核页表。(因为当进程内核态切换scheduler的时候，它只是恢复了scheduler的寄存器就直接切过来了，没有切换页表的操作)<br>但是，scheduler作为一个特殊内核进程，它没有proc结构体！(lec11中Robert教授答学生问)因此它只能使用全局内核页表。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20thread/" rel="prev" title="Lab Thread">
+      <i class="fa fa-chevron-left"></i> Lab Thread
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20net/" rel="next" title="Lab Net">
+      Lab Net <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Lab-Page-Table"><span class="nav-number">1.</span> <span class="nav-text">Lab Page Table</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81xv6%E4%B8%89%E7%BA%A7page-table-%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.1.</span> <span class="nav-text">一、xv6三级page table 原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-Print-a-page-table"><span class="nav-number">1.2.</span> <span class="nav-text">Task: Print a page table</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-A-kernel-page-table-per-process"><span class="nav-number">1.3.</span> <span class="nav-text">Task: A kernel page table per process</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-simplify-copyin-copyinstr"><span class="nav-number">1.4.</span> <span class="nav-text">Task: simplify copyin&#x2F;copyinstr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">1.5.</span> <span class="nav-text">后记</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">genesis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2024.02 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">genesis</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">70k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:03</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

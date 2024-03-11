@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Lab Traps前置知识一、stack stack储存方式和heap相反，它是向下增长的，有两个重要的寄存器，fp和sp。fp指向当前frame的顶(上)，sp指向的是当前frame的底(下)。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lab Traps">
+<meta property="og:url" content="http://example.com/2024/03/11/lab%20traps/index.html">
+<meta property="og:site_name" content="genesis的空间站">
+<meta property="og:description" content="Lab Traps前置知识一、stack stack储存方式和heap相反，它是向下增长的，有两个重要的寄存器，fp和sp。fp指向当前frame的顶(上)，sp指向的是当前frame的底(下)。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-11T09:06:29.108Z">
+<meta property="article:modified_time" content="2024-03-11T11:42:32.861Z">
+<meta property="article:author" content="genesis">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/03/11/lab%20traps/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Lab Traps | genesis的空间站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">genesis的空间站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-learn">
+
+    <a href="/learn/ln.html" rel="section"><i class="fa fa-cog fa-fw"></i>路漫漫</a>
+
+  </li>
+        <li class="menu-item menu-item-think">
+
+    <a href="/think/" rel="section"><i class="fa fa-snowflake fa-fw"></i>朝闻道</a>
+
+  </li>
+        <li class="menu-item menu-item-write">
+
+    <a href="/write/wt.html" rel="section"><i class="fa fa-ring fa-fw"></i>新世界</a>
+
+  </li>
+        <li class="menu-item menu-item-nothing">
+
+    <a href="/nothing/nt.html" rel="section"><i class="fa fa-fan fa-fw"></i>览星海</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20traps/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="genesis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="genesis的空间站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lab Traps
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:32" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Lab-Traps"><a href="#Lab-Traps" class="headerlink" title="Lab Traps"></a>Lab Traps</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、stack"><a href="#一、stack" class="headerlink" title="一、stack"></a>一、stack</h3><ol>
+<li>stack储存方式和heap相反，它是向下增长的，有两个重要的寄存器，fp和sp。fp指向当前frame的顶(上)，sp指向的是当前frame的底(下)。<span id="more"></span></li>
+<li>stack中函数的return address和上一个fp的地址储存在当前fp的固定偏移量上，通过lab hints我们可以知道一个是-8，一个是-16。</li>
+</ol>
+<h2 id="Task-RISC-V-assembly"><a href="#Task-RISC-V-assembly" class="headerlink" title="Task RISC-V assembly"></a>Task RISC-V assembly</h2><p>根据实验提示，我们make fs.img出user&#x2F;call.asm来分析。</p>
+<p>1. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">24:	4635                	li	a2,13</span><br></pre></td></tr></table></figure>
+<p>可以看出a2储存了13。</p>
+<p>2. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">26:	45b1                	li	a1,12</span><br></pre></td></tr></table></figure>
+<p>可以看出编译器使用了inline优化，直接算出了12并储存在a1中。</p>
+<p>3. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">30:	00000097          	auipc	ra,0x0</span><br><span class="line">34:	610080e7          	jalr	1552(ra) # 640 &lt;printf&gt;</span><br></pre></td></tr></table></figure>
+<p>可以看出printf在640位置上。注意auipc这个指令，它把0这个立即数左移12位并加上pc(+4)的值后赋给了ra，然后加上了1552找到了printf</p>
+<ol start="4">
+<li><p>jalr这个指令会把当前pc加4(指向下一条pc指令)并赋给ra</p>
+</li>
+<li><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">unsigned int i = 0x00646c72;</span><br><span class="line">printf(&quot;H%x Wo%s&quot;, 57616, &amp;i);</span><br></pre></td></tr></table></figure>
+<p>输出的是HE110 World。前一个%x是十六进制转换，后一个因为riscv是”little-endian”，他会从后往前转换字符。</p>
+</li>
+<li><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf(&quot;x=%d y=%d&quot;, 3);</span><br></pre></td></tr></table></figure>
+<p>因为printf的format储存在a0，3存储在a1，所以当它试图print第二个数时，就会把a2中的无关值输出出来。</p>
+</li>
+</ol>
+<h2 id="Task-Backtrace"><a href="#Task-Backtrace" class="headerlink" title="Task Backtrace"></a>Task Backtrace</h2><p>这个task要求我们实现一个回溯的syscall，它通过遍历整个stack来输出所有stack frame中的函数地址。</p>
+<ol>
+<li>根据提示添加r_fp()，并在sys_sleep中添加backtrace()。</li>
+<li>因为fp的存在和上一个fp地址的储存，我们可以通过类似遍历链表的方式将stack从下到上遍历一遍，每遍历到一个frame我们就print出它储存的return address。注意添加def.h<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// printf.c</span><br><span class="line">void backtrace(void)</span><br><span class="line">&#123;</span><br><span class="line">  printf(&quot;backtrace:\n&quot;);</span><br><span class="line">  uint64 cur_fp = r_fp(); // 当前fp</span><br><span class="line">  uint64 top_fp = PGROUNDUP(cur_fp); // PGROUNDUP可以找到当前stack的顶</span><br><span class="line">  while(top_fp &gt; cur_fp)</span><br><span class="line">  &#123;</span><br><span class="line">    uint64 va = *(pte_t *)(cur_fp - 0x08);</span><br><span class="line">    printf(&quot;%p\n&quot;, va);</span><br><span class="line">    cur_fp = *(pte_t *)(cur_fp - 0x10); // 跳转到前一个fp</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="Task-Alarm"><a href="#Task-Alarm" class="headerlink" title="Task Alarm"></a>Task Alarm</h2><p>这个task要求我们实现一个alarm功能，每当clock中断执行一定的次数后，就会调用这个alarm函数(注意这个函数是xv6自带的)，输出一个alarm！。</p>
+<ol>
+<li>首先，我们需要在proc结构体里保存三个需要的参数，分别是clock需要执行的次数，alarm函数的地址和clock已经执行的次数，并把它们在allocproc初始化。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// proc.h</span><br><span class="line">...</span><br><span class="line">  char name[16];               // Process name (debugging)</span><br><span class="line">  int alarm_pe;</span><br><span class="line">  void (*alarm_handler)();</span><br><span class="line">  int ticks;</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">// proc.c/ allocproc()</span><br><span class="line">  p-&gt;alarm_handler = 0;</span><br><span class="line">  p-&gt;alarm_pe = 0;</span><br><span class="line">  p-&gt;ticks = 0;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
+<li>当一个用户函数要初始化alarm功能时，他需要呼叫sys_sigalarm。我们需要实现这个syscall。关于sys_sigreturn，你可以先写上它并只让它返回0。(还记得那些步骤吗，此处省略了)<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">uint64 </span><br><span class="line">sys_sigalarm(void)</span><br><span class="line">&#123;</span><br><span class="line">  struct proc *prc = myproc();</span><br><span class="line">  int period;</span><br><span class="line">  if (argint(0, &amp;period) &lt; 0) // 读入周期</span><br><span class="line">    return -1;</span><br><span class="line">  uint64 p;</span><br><span class="line">  if (argaddr(1, &amp;p) &lt; 0) // 读入alarm地址</span><br><span class="line">    return -1;</span><br><span class="line">  </span><br><span class="line">  prc-&gt;alarm_pe = period;</span><br><span class="line">  prc-&gt;alarm_handler = (void(*)())p;</span><br><span class="line">  prc-&gt;ticks = 0;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">uint64 </span><br><span class="line">sys_sigreturn(void)&#123;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>我们需要修改usertrap，每次发生clock interrupt的时候给ticks加一，当ticks等于alarm_pe的时候就将alarm地址写入异常中断寄存器epc中。然后系统就会中断并自动调用alarm。此时第一个小任务完成。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if(which_dev == 2) &#123;</span><br><span class="line">  p-&gt;ticks ++;</span><br><span class="line">  if (p-&gt;alarm_pe != 0 &amp;&amp; p-&gt;ticks == p-&gt;alarm_pe &amp;&amp; p-&gt;isalarm == 0) &#123;</span><br><span class="line">    p-&gt;trapframe-&gt;epc = (uint64)p-&gt;alarm_handler;//set the address of syscall alarm</span><br><span class="line">    p-&gt;ticks = 0;//it can also be set in sys_sigreturn</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></li>
+<li>因为alarm调用被设为一个中断，所以必须将调用alarm前所有的user寄存器保存起来，防止中断后对用户寄存器的复写。同时，因为xv6并行，在处理完一个alarm之前不能进行另一个alarm的处理，因此我们需要一个标志来记录当前是否有alarm在处理。因此需要在proc里再添加两个参数。它们需要被初始化，trapframe用完要释放。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">// proc.h</span><br><span class="line">  int isalarm;</span><br><span class="line">  struct trapframe *atrapframe;</span><br><span class="line"></span><br><span class="line">// proc.c/ allocproc()</span><br><span class="line">  p-&gt;isalarm = 0;</span><br><span class="line"></span><br><span class="line">// proc.c/ freeproc()</span><br><span class="line">static void</span><br><span class="line">freeproc(struct proc *p)</span><br><span class="line">&#123;</span><br><span class="line">  if(p-&gt;trapframe)</span><br><span class="line">    kfree((void*)p-&gt;trapframe);</span><br><span class="line">  if(p-&gt;atrapframe)</span><br><span class="line">    kfree((void*)p-&gt;atrapframe); // 释放</span><br><span class="line">  p-&gt;trapframe = 0;</span><br><span class="line">  p-&gt;atrapframe = 0;</span><br><span class="line">  if(p-&gt;pagetable)</span><br><span class="line">    proc_freepagetable(p-&gt;pagetable, p-&gt;sz);</span><br><span class="line">  p-&gt;pagetable = 0;</span><br><span class="line">  p-&gt;sz = 0;</span><br><span class="line">  p-&gt;pid = 0;</span><br><span class="line">  p-&gt;parent = 0;</span><br><span class="line">  p-&gt;name[0] = 0;</span><br><span class="line">  p-&gt;chan = 0;</span><br><span class="line">  p-&gt;killed = 0;</span><br><span class="line">  p-&gt;xstate = 0;</span><br><span class="line">  p-&gt;state = UNUSED;</span><br><span class="line">  p-&gt;isalarm = 0; // 恢复</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>修改usertrap来保存寄存器并设置isalarm。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">if(which_dev == 2) &#123;</span><br><span class="line">    p-&gt;ticks ++;</span><br><span class="line">    if (p-&gt;alarm_pe != 0 &amp;&amp; p-&gt;ticks == p-&gt;alarm_pe &amp;&amp; p-&gt;isalarm == 0) &#123;</span><br><span class="line">      p-&gt;isalarm = 1;//set alarm flag</span><br><span class="line">      *p-&gt;atrapframe = *p-&gt;trapframe;//备份寄存器</span><br><span class="line">      p-&gt;trapframe-&gt;epc = (uint64)p-&gt;alarm_handler;//set the address of syscall alarm</span><br><span class="line">      p-&gt;ticks = 0;//it can also be set in sys_sigreturn</span><br><span class="line">    &#125;</span><br><span class="line">    yield();    </span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></li>
+<li>最后，在sigreturn中，我们需要恢复所有的寄存器，恢复isalarm。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">uint64 </span><br><span class="line">sys_sigreturn(void)&#123;</span><br><span class="line">  struct proc* p = myproc();</span><br><span class="line">  if (p-&gt;isalarm)&#123;</span><br><span class="line">    p-&gt;isalarm = 0;</span><br><span class="line">    *p-&gt;trapframe = *p-&gt;atrapframe;//恢复寄存器</span><br><span class="line">  &#125;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+至此，lab traps结束。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20cow/" rel="prev" title="Lab Copy on Write Fork">
+      <i class="fa fa-chevron-left"></i> Lab Copy on Write Fork
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20syscall/" rel="next" title="Lab Syscall">
+      Lab Syscall <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Lab-Traps"><span class="nav-number">1.</span> <span class="nav-text">Lab Traps</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81stack"><span class="nav-number">1.1.1.</span> <span class="nav-text">一、stack</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-RISC-V-assembly"><span class="nav-number">1.2.</span> <span class="nav-text">Task RISC-V assembly</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-Backtrace"><span class="nav-number">1.3.</span> <span class="nav-text">Task Backtrace</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-Alarm"><span class="nav-number">1.4.</span> <span class="nav-text">Task Alarm</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">genesis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2024.02 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">genesis</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">70k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:03</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

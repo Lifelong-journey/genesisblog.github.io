@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Lab Syscall前置知识一、添加一个syscall的流程 当你想要添加编译一个user下的源文件，你需要把它加到Makefile中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lab Syscall">
+<meta property="og:url" content="http://example.com/2024/03/11/lab%20syscall/index.html">
+<meta property="og:site_name" content="genesis的空间站">
+<meta property="og:description" content="Lab Syscall前置知识一、添加一个syscall的流程 当你想要添加编译一个user下的源文件，你需要把它加到Makefile中">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-11T09:06:29.108Z">
+<meta property="article:modified_time" content="2024-03-11T11:42:04.598Z">
+<meta property="article:author" content="genesis">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/03/11/lab%20syscall/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Lab Syscall | genesis的空间站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">genesis的空间站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-learn">
+
+    <a href="/learn/ln.html" rel="section"><i class="fa fa-cog fa-fw"></i>路漫漫</a>
+
+  </li>
+        <li class="menu-item menu-item-think">
+
+    <a href="/think/" rel="section"><i class="fa fa-snowflake fa-fw"></i>朝闻道</a>
+
+  </li>
+        <li class="menu-item menu-item-write">
+
+    <a href="/write/wt.html" rel="section"><i class="fa fa-ring fa-fw"></i>新世界</a>
+
+  </li>
+        <li class="menu-item menu-item-nothing">
+
+    <a href="/nothing/nt.html" rel="section"><i class="fa fa-fan fa-fw"></i>览星海</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20syscall/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="genesis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="genesis的空间站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lab Syscall
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:04" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Lab-Syscall"><a href="#Lab-Syscall" class="headerlink" title="Lab Syscall"></a>Lab Syscall</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、添加一个syscall的流程"><a href="#一、添加一个syscall的流程" class="headerlink" title="一、添加一个syscall的流程"></a>一、添加一个syscall的流程</h3><ol>
+<li>当你想要添加编译一个user下的源文件，你需要把它加到Makefile中<span id="more"></span></li>
+<li>为了生成进入中断的汇编.s文件，需要在user&#x2F;user.pl中加入进入内核态的入口函数声明，以便使用ecall中断user进入kernel<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">entry(“trace”);</span><br></pre></td></tr></table></figure></li>
+<li>需要在kernel&#x2F;syscall.h中添加系统调用指令码<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">#define SYS_mkdir  20</span><br><span class="line">#define SYS_close  21</span><br><span class="line">#define SYS_trace  22</span><br><span class="line">#define SYS_sysinfo 23</span><br></pre></td></tr></table></figure></li>
+<li>需要在kernel&#x2F;syscall.c中添加定义和入口<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">extern uint64 sys_trace(void);</span><br><span class="line">...</span><br><span class="line">static uint64 (*syscalls[])(void) = &#123;</span><br><span class="line">[SYS_fork]    sys_fork,</span><br><span class="line">...</span><br><span class="line">[SYS_trace]   sys_trace,</span><br><span class="line">[SYS_sysinfo] sys_sysinfo,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>如果user下的程序需要调用这个syscall，那么就需要在user&#x2F;user.h中加入syscall函数声明</li>
+</ol>
+<h3 id="二、阅读内存分配的代码实现kernel-kalloc-c"><a href="#二、阅读内存分配的代码实现kernel-kalloc-c" class="headerlink" title="二、阅读内存分配的代码实现kernel&#x2F;kalloc.c"></a>二、阅读内存分配的代码实现kernel&#x2F;kalloc.c</h3><ol>
+<li>xv6拥有一个链表来记录所有的分页，每一个节点都是一个page，头节点储存了最后一个空page的地址，同时，它拥有一个end数组来记录kernel后的第一个地址。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">struct run &#123;</span><br><span class="line">  struct run *next;//linked list pointer</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">struct &#123;</span><br><span class="line">  struct spinlock lock;</span><br><span class="line">  struct run *freelist;</span><br><span class="line">&#125; kmem;//linked list, the implementation of the pages</span><br><span class="line">//这里直接声明了一个实例kmem，因此可以直接用</span><br></pre></td></tr></table></figure></li>
+<li>首先，它会初始化一个lock来避免多核时共享资源出现死锁，然后调用freerange</li>
+<li>在freerange里，它调用kfree把所有pages清空<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void</span><br><span class="line">freerange(void *pa_start, void *pa_end)</span><br><span class="line">&#123;</span><br><span class="line">  char *p;</span><br><span class="line">  p = (char*)PGROUNDUP((uint64)pa_start);</span><br><span class="line">  for(; p + PGSIZE &lt;= (char*)pa_end; p += PGSIZE)</span><br><span class="line">    kfree(p);//通过这个循环将所有pages初始化为1(free all the pages)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>在kfree中，它把需要free的page填充为1，然后更新头节点<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// Fill with junk to catch dangling refs.</span><br><span class="line">memset(pa, 1, PGSIZE);</span><br><span class="line"></span><br><span class="line">r = (struct run*)pa;</span><br><span class="line"></span><br><span class="line">acquire(&amp;kmem.lock);//r-&gt;next: 上一个节点的指针</span><br><span class="line">r-&gt;next = kmem.freelist;//freelist: 可用的最后一个page的地址</span><br><span class="line">kmem.freelist = r;</span><br><span class="line">release(&amp;kmem.lock);</span><br></pre></td></tr></table></figure></li>
+<li>在kalloc（分配内存函数）中，它把最后的空page拿出，更新头节点，然后把这个page填充为5并返回它的指针<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">void *</span><br><span class="line">kalloc(void)</span><br><span class="line">&#123;</span><br><span class="line">  struct run *r;</span><br><span class="line"></span><br><span class="line">  acquire(&amp;kmem.lock);</span><br><span class="line">  r = kmem.freelist;</span><br><span class="line">  if(r)</span><br><span class="line">    kmem.freelist = r-&gt;next;//可用page指针前移</span><br><span class="line">  release(&amp;kmem.lock);</span><br><span class="line"></span><br><span class="line">  if(r)</span><br><span class="line">    memset((char*)r, 5, PGSIZE); // fill with junk</span><br><span class="line">  return (void*)r;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>注意：在一个进程的pages中，不可用页的freelist默认被初始化为0，而可用空间的逻辑地址在分配时是连续的，所以可以通过遍历链表来找出所有的空page</li>
+</ol>
+<h3 id="三、阅读进程管理部分代码实现kernel-proc-c，proc-h"><a href="#三、阅读进程管理部分代码实现kernel-proc-c，proc-h" class="headerlink" title="三、阅读进程管理部分代码实现kernel&#x2F;proc.c，proc.h"></a>三、阅读进程管理部分代码实现kernel&#x2F;proc.c，proc.h</h3><ol>
+<li>在proc.h中，定义了一个proc结构体，它储存了一个进程的各种信息，当你想记录一个进程的新的信息时，就可以在这里面直接添加变量。proc.h中还有一个enum，定义了一个进程的五种状态。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">enum procstate &#123; UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE &#125;;//all the process state in struct proc</span><br><span class="line"></span><br><span class="line">// Per-process state</span><br><span class="line">struct proc &#123;</span><br><span class="line">  struct spinlock lock;</span><br><span class="line"></span><br><span class="line">  // p-&gt;lock must be held when using these:</span><br><span class="line">  enum procstate state;        // Process state</span><br><span class="line">  struct proc *parent;         // Parent process</span><br><span class="line">  void *chan;                  // If non-zero, sleeping on chan</span><br><span class="line">  int killed;                  // If non-zero, have been killed</span><br><span class="line">  int xstate;                  // Exit status to be returned to parent&#x27;s wait</span><br><span class="line">  int pid;                     // Process ID</span><br><span class="line"></span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line">  int mask;                    // The &quot;trace&quot;&#x27;s argument</span><br><span class="line">                               //注意：你不能在结构体里给它初始化，需要去allocproc里面赋值</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>在proc.c中，声明了一个记录所有cpu状态的struct cpus，一个记录所有进程信息的proc数组。注意：在proc里，空的数组单元中state变量是UNUSED（0），代表当前单元没有储存进程信息。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct cpu cpus[NCPU];</span><br><span class="line"></span><br><span class="line">struct proc proc[NPROC];//存储了所有的process信息</span><br></pre></td></tr></table></figure></li>
+<li>allocproc: 这个函数会从头开始寻找一个空的process table，如果找到的这个page table是合法的，那么将它的内容初始化</li>
+<li>freeproc： 这个函数会将一个page table free掉</li>
+</ol>
+<h3 id="四、阅读kernel-syscall-c和部分汇编"><a href="#四、阅读kernel-syscall-c和部分汇编" class="headerlink" title="四、阅读kernel&#x2F;syscall.c和部分汇编"></a>四、阅读kernel&#x2F;syscall.c和部分汇编</h3><ol>
+<li>在usys.S中，可以看到所有的系统调用号都储存在a7寄存器中</li>
+<li>在argaddr和argint中，都是根据给定的序号来从register中获取数据，区别是返回int还是unsigned long,因为kernel和user的page table映射不一样，寄存器也不互通，所以需要类似的函数传参</li>
+<li>在syscall函数中，先获取当前进程，然后获取当前进程所使用的系统调用号。如果系统调用执行成功，那就把返回值记录到a0寄存器中，如果失败，a0被设置为-1</li>
+</ol>
+<h2 id="task-system-call-tracing"><a href="#task-system-call-tracing" class="headerlink" title="task: system call tracing"></a>task: system call tracing</h2><ol>
+<li>根据添加syscall的流程添加syscall sys_trace</li>
+<li>在PCB中加入一个mask掩码变量来储存系统调用号(kernel&#x2F;proc.h)</li>
+<li>对fork()进行修改,通过让子进程继承父进程的mask来追踪子进程的mask(kernel&#x2F;proc.c)</li>
+<li>将mask初始化为0，同时还可以在销毁page时把它置为0(kernel&#x2F;proc.c, allocproc)(kernel&#x2F;proc.c, freeproc)</li>
+<li>实现sys_trace具体代码。先获取当前进程的mask，然后将该mask传递给trace函数(kernel&#x2F;sysproc.c)<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">uint64</span><br><span class="line">sys_trace(void)</span><br><span class="line">&#123;</span><br><span class="line">  int mask;</span><br><span class="line">  if(argint(0, &amp;mask) &lt; 0)</span><br><span class="line">    return -1;//获取mask</span><br><span class="line">  myproc()-&gt;mask = mask; // 传参</span><br><span class="line">  return 0;// myproc()获取当前进程的PCB</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>加入一个字符串数组，用来输出syscall name(kernel&#x2F;syscall.c)<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">static char *syscalls_name[] = &#123;</span><br><span class="line">  &quot;fork&quot;, &quot;exit&quot;, &quot;wait&quot;, &quot;pipe&quot;,</span><br><span class="line">  &quot;read&quot;, &quot;kill&quot;, &quot;exec&quot;, &quot;fstat&quot;,</span><br><span class="line">  &quot;chdir&quot;, &quot;dup&quot;, &quot;getpid&quot;, &quot;sbrk&quot;,</span><br><span class="line">  &quot;sleep&quot;, &quot;uptime&quot;, &quot;open&quot;, &quot;write&quot;,</span><br><span class="line">  &quot;mknod&quot;, &quot;unlink&quot;, &quot;link&quot;, &quot;mkdir&quot;,</span><br><span class="line">  &quot;close&quot;, &quot;trace&quot;, &quot;sysinfo&quot;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>在syscall函数中进行输出(kernel&#x2F;syscall.c)<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">void</span><br><span class="line">syscall(void)</span><br><span class="line">&#123;</span><br><span class="line">  int num;</span><br><span class="line">  struct proc *p = myproc();</span><br><span class="line"></span><br><span class="line">  num = p-&gt;trapframe-&gt;a7;</span><br><span class="line">  if(num &gt; 0 &amp;&amp; num &lt; NELEM(syscalls) &amp;&amp; syscalls[num]) &#123;</span><br><span class="line">    p-&gt;trapframe-&gt;a0 = syscalls[num]();//注意：这是将系统调用的返回值存储在a0中</span><br><span class="line">    if(p-&gt;mask &amp; (1 &lt;&lt; num)) &#123;//mask的对应位为1（仔细读lab要求）</span><br><span class="line">      printf(&quot;%d: syscall %s -&gt; %d\n&quot;, p-&gt;pid, syscalls_name[num - 1], p-&gt;trapframe-&gt;a0);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    printf(&quot;%d %s: unknown sys call %d\n&quot;,</span><br><span class="line">            p-&gt;pid, p-&gt;name, num);</span><br><span class="line">    p-&gt;trapframe-&gt;a0 = -1;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="task-sysinfo"><a href="#task-sysinfo" class="headerlink" title="task: sysinfo"></a>task: sysinfo</h2><ol>
+<li>根据添加syscall的流程添加syscall sys_sysinfo，注意，在makefile中添加的时sysinfotest，同时声明该函数之前要声明它的结构体类型的参数sysinfo(user&#x2F;user.h)</li>
+<li>在kernel&#x2F;proc.c中添加一个函数来获取非空闲进程个数<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">int free_proc(void)</span><br><span class="line">&#123;</span><br><span class="line">  uint64 cnt = 0;</span><br><span class="line">  struct proc *p;</span><br><span class="line">  for(p = proc; p &lt;= &amp;proc[NPROC]; p++)//遍历proc数组</span><br><span class="line">  &#123;</span><br><span class="line">    acquire(&amp;p-&gt;lock);//暂时不太清楚锁的用途</span><br><span class="line">    if(p-&gt;state != UNUSED)</span><br><span class="line">      cnt ++;</span><br><span class="line">    release(&amp;p-&gt;lock);</span><br><span class="line">  &#125;</span><br><span class="line">  return cnt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>在kernel&#x2F;kalloc.c中添加一个函数来获取当前空闲内存大小<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int free_memory(void)</span><br><span class="line">&#123;</span><br><span class="line">  struct run * r;</span><br><span class="line">  r = kmem.freelist;</span><br><span class="line">  uint64 cnt = 0;</span><br><span class="line">  while(r)//为什么第一个不可用页是0呢？难道是默认初始化？//是的，具体请看后记</span><br><span class="line">  &#123;</span><br><span class="line">    cnt ++;</span><br><span class="line">    r = r-&gt;next;</span><br><span class="line">  &#125;</span><br><span class="line">  return cnt * PGSIZE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>在kernel&#x2F;sysproc.c中声明以上两个函数，并实现sys_sysinfo系统调用<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">uint64</span><br><span class="line">sys_sysinfo(void)</span><br><span class="line">&#123;</span><br><span class="line">  struct sysinfo info;</span><br><span class="line">  uint64 addr;</span><br><span class="line">  struct proc *p = myproc();</span><br><span class="line">  if(argaddr(0, &amp;addr) &lt; 0)</span><br><span class="line">    return -1;</span><br><span class="line">  </span><br><span class="line">  info.freemem = free_memory();</span><br><span class="line">  info.nproc = free_proc();</span><br><span class="line"></span><br><span class="line">  if(copyout(p-&gt;pagetable, addr, (char *)&amp;info, sizeof info) &lt; 0)</span><br><span class="line">    return -1;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><ol>
+<li>关于链表尾节点的初始化问题，后来发现的确是这样。在声明kmem时，kmem的freelist初始化为0，第一次插入空闲页表的时候，0自然会传递给run的next，因此，链表尾部的next一定为0。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20traps/" rel="prev" title="Lab Traps">
+      <i class="fa fa-chevron-left"></i> Lab Traps
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20thread/" rel="next" title="Lab Thread">
+      Lab Thread <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Lab-Syscall"><span class="nav-number">1.</span> <span class="nav-text">Lab Syscall</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AAsyscall%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="nav-number">1.1.1.</span> <span class="nav-text">一、添加一个syscall的流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E9%98%85%E8%AF%BB%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%9A%84%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0kernel-kalloc-c"><span class="nav-number">1.1.2.</span> <span class="nav-text">二、阅读内存分配的代码实现kernel&#x2F;kalloc.c</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E9%98%85%E8%AF%BB%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86%E9%83%A8%E5%88%86%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0kernel-proc-c%EF%BC%8Cproc-h"><span class="nav-number">1.1.3.</span> <span class="nav-text">三、阅读进程管理部分代码实现kernel&#x2F;proc.c，proc.h</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E9%98%85%E8%AF%BBkernel-syscall-c%E5%92%8C%E9%83%A8%E5%88%86%E6%B1%87%E7%BC%96"><span class="nav-number">1.1.4.</span> <span class="nav-text">四、阅读kernel&#x2F;syscall.c和部分汇编</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#task-system-call-tracing"><span class="nav-number">1.2.</span> <span class="nav-text">task: system call tracing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#task-sysinfo"><span class="nav-number">1.3.</span> <span class="nav-text">task: sysinfo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">1.4.</span> <span class="nav-text">后记</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">genesis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2024.02 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">genesis</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">70k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:03</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

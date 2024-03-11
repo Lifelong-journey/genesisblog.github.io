@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Lab Copy on Write Fork前置知识一、原理 在xv6原始的eager fork中，执行fork会立刻将parent的所有页拷贝一份给child，但有时child会执行exec，然后丢到所有的拷贝，加载exec中的内容。这种重复的拷贝会浪费时空，因此可以进行copy on write fork。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lab Copy on Write Fork">
+<meta property="og:url" content="http://example.com/2024/03/11/lab%20cow/index.html">
+<meta property="og:site_name" content="genesis的空间站">
+<meta property="og:description" content="Lab Copy on Write Fork前置知识一、原理 在xv6原始的eager fork中，执行fork会立刻将parent的所有页拷贝一份给child，但有时child会执行exec，然后丢到所有的拷贝，加载exec中的内容。这种重复的拷贝会浪费时空，因此可以进行copy on write fork。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-11T09:06:29.107Z">
+<meta property="article:modified_time" content="2024-03-11T11:42:14.484Z">
+<meta property="article:author" content="genesis">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/03/11/lab%20cow/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Lab Copy on Write Fork | genesis的空间站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">genesis的空间站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-learn">
+
+    <a href="/learn/ln.html" rel="section"><i class="fa fa-cog fa-fw"></i>路漫漫</a>
+
+  </li>
+        <li class="menu-item menu-item-think">
+
+    <a href="/think/" rel="section"><i class="fa fa-snowflake fa-fw"></i>朝闻道</a>
+
+  </li>
+        <li class="menu-item menu-item-write">
+
+    <a href="/write/wt.html" rel="section"><i class="fa fa-ring fa-fw"></i>新世界</a>
+
+  </li>
+        <li class="menu-item menu-item-nothing">
+
+    <a href="/nothing/nt.html" rel="section"><i class="fa fa-fan fa-fw"></i>览星海</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20cow/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="genesis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="genesis的空间站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lab Copy on Write Fork
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:14" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Lab-Copy-on-Write-Fork"><a href="#Lab-Copy-on-Write-Fork" class="headerlink" title="Lab Copy on Write Fork"></a>Lab Copy on Write Fork</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、原理"><a href="#一、原理" class="headerlink" title="一、原理"></a>一、原理</h3><ol>
+<li>在xv6原始的eager fork中，执行fork会立刻将parent的所有页拷贝一份给child，但有时child会执行exec，然后丢到所有的拷贝，加载exec中的内容。这种重复的拷贝会浪费时空，因此可以进行copy on write fork。<span id="more"></span></li>
+<li>在cow中，执行fork只会拷贝parent的页表，这些页表不分配空间，而是指向parent的页。parent的页此时不能有PTE_W位(只读)，当出现修改请求时，会出现一个page fault(13, 15)，此时再copy一个新页并分配给请求修改的地址就可以了(此时分配的page可读可写)</li>
+<li>因为每一个parent可能会有多个child，因此每一个页在这些child都分配出去之前是不能被释放的，也就是说，一个页只有引用次数为1的时候才可以被释放。关于引用的计数，可以通过开一个大数组来记录所有页的引用次数(但总感觉10^6的int数组有点大)</li>
+</ol>
+<h2 id="task-Implement-copy-on-write"><a href="#task-Implement-copy-on-write" class="headerlink" title="task: Implement copy-on write"></a>task: Implement copy-on write</h2><ol>
+<li><p>首先，我们需要拿出一位flag来记录当前page是否是一个cow page，根据录播课，可拿出第八位</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//riscv.h</span><br><span class="line">...</span><br><span class="line">#define PTE_W (1L &lt;&lt; 2)</span><br><span class="line">#define PTE_X (1L &lt;&lt; 3)</span><br><span class="line">#define PTE_U (1L &lt;&lt; 4) // 1 -&gt; user can access</span><br><span class="line">#define PTE_F (1L &lt;&lt; 8) // copy-on-write fork</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>然后，我们需要一个数组来记录所有page的引用次数。这里有几个特殊地方需要注意：</p>
+</li>
+</ol>
+<p>因为整个cow fork与IO模拟设备无关，因此完全可以不用记录KERNBASE(0x80000000L)之下的page，这样可以节省一些空间消耗。</p>
+<p>这个数组的每一个元素都要加自旋锁。如果不加，则可能会出现两个core同时申请一个parent的free 和 fork,两者同时拿到了parent的引用次数2，此时假设先执行fork，则引用加一为3，后执行free，引用减一为1，而后执行的结果会覆盖先执行的结果，从而导致race condition。对于到底是给每个元素加lock还是给整个数组加lock，我觉得应该是前者。因为如果给整个数组加lock，则这个数组只能在同一时间被一个core所使用，这显然会在并发中导致阻塞。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// kalloc.c</span><br><span class="line">struct Pagecount&#123; // count for physical memory reference</span><br><span class="line">  struct spinlock lock;</span><br><span class="line">  int cnt; // 猜测是给元素加lock,因为如果整个加lock大概会影响并发</span><br><span class="line">&#125;ref[(PHYSTOP - KERNBASE) / PGSIZE];</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>初始化自旋锁和元素值。关于为何要把每一个cnt设置为1，因为每次启动kernel的时候，都会kfree一遍所有的page，在kfree中，会把cnt-1，因此要先+1。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">// kalloc.c</span><br><span class="line">void</span><br><span class="line">kinit()</span><br><span class="line">&#123;</span><br><span class="line">  for (int i = 0; i &lt; (PHYSTOP - KERNBASE) / PGSIZE; i++)</span><br><span class="line">    initlock(&amp;ref[i].lock, &quot;cow&quot;);</span><br><span class="line">  initlock(&amp;kmem.lock, &quot;kmem&quot;);</span><br><span class="line">  freerange(end, (void*)PHYSTOP);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void</span><br><span class="line">freerange(void *pa_start, void *pa_end)</span><br><span class="line">&#123;</span><br><span class="line">  char *p;</span><br><span class="line">  p = (char*)PGROUNDUP((uint64)pa_start);</span><br><span class="line">  for(; p + PGSIZE &lt;= (char*)pa_end; p += PGSIZE)</span><br><span class="line">  &#123;</span><br><span class="line">    ref[((uint64)p - KERNBASE) / PGSIZE].cnt = 1; //因为kfree会-1</span><br><span class="line">    kfree(p);    </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>正如原理所说，在kfree中，只有引用次数为1的page才可以被释放，否则就只是给它的引用次数减一。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">void</span><br><span class="line">kfree(void *pa)</span><br><span class="line">&#123;</span><br><span class="line">  struct run *r;</span><br><span class="line"></span><br><span class="line">  if(((uint64)pa % PGSIZE) != 0 || (char*)pa &lt; end || (uint64)pa &gt;= PHYSTOP)</span><br><span class="line">    panic(&quot;kfree&quot;);</span><br><span class="line">  uint64 rpa = ((uint64)pa - KERNBASE) / PGSIZE;</span><br><span class="line">  acquire(&amp;ref[rpa].lock);</span><br><span class="line">  if ((--ref[rpa].cnt) &lt;= 0)&#123;</span><br><span class="line">  // Fill with junk to catch dangling refs.</span><br><span class="line">  memset(pa, 1, PGSIZE);</span><br><span class="line"></span><br><span class="line">  r = (struct run*)pa;</span><br><span class="line"></span><br><span class="line">  acquire(&amp;kmem.lock);</span><br><span class="line">  r-&gt;next = kmem.freelist;</span><br><span class="line">  kmem.freelist = r;</span><br><span class="line">  release(&amp;kmem.lock);</span><br><span class="line">  &#125;</span><br><span class="line">  release(&amp;ref[rpa].lock);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>同时，在kalloc中，也需要把每一个初始分配的page引用计数设为1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">if(r) &#123;</span><br><span class="line">  memset((char*)r, 5, PGSIZE); // fill with junk    </span><br><span class="line">  uint64 rpa = ((uint64)r - KERNBASE) / PGSIZE;</span><br><span class="line">  acquire(&amp;ref[rpa].lock);</span><br><span class="line">  if (ref[rpa].cnt)</span><br><span class="line">    panic(&quot;kalloc: not a free page&quot;);</span><br><span class="line">  ref[rpa].cnt = 1;</span><br><span class="line">  release(&amp;ref[rpa].lock);    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>把判断一个page是否是cow page，改变一个page的引用计数封装成函数(其实也可以直接写)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">// kalloc.c</span><br><span class="line">// 修改cow计数</span><br><span class="line">void changeref(uint64 pa, uint64 num)</span><br><span class="line">&#123;</span><br><span class="line">  if (pa &gt;= PHYSTOP)</span><br><span class="line">    panic(&quot;chgref: pa too big&quot;);</span><br><span class="line">  if (pa % PGSIZE != 0)</span><br><span class="line">    panic(&quot;chgref: not a complete page&quot;);</span><br><span class="line">  uint64 rpa = (pa - KERNBASE) / PGSIZE;</span><br><span class="line">  acquire(&amp;ref[rpa].lock);</span><br><span class="line">  ref[rpa].cnt += num;</span><br><span class="line">  release(&amp;ref[rpa].lock); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 该page是否是cow page</span><br><span class="line">int iscow(pagetable_t pagetable, uint64 va)</span><br><span class="line">&#123;</span><br><span class="line">  if (va &gt;= MAXVA)</span><br><span class="line">    return -1;</span><br><span class="line">  pte_t* pte = walk(pagetable, va, 0);</span><br><span class="line">  if (!pte)</span><br><span class="line">    return -1;</span><br><span class="line">  if((*pte &amp; PTE_V) == 0)</span><br><span class="line">    return -1;</span><br><span class="line">  return ((*pte) &amp; PTE_F ? 0 : -1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>此时，如果申请修改，那么会有page fault，此时如果该page只有一个引用，那么把flag还原一下就好，如果有多个引用，那么就分配一个可修改的page，然后把引用数减一。因为它冗杂且多用，因此封装为函数。注意，所有新添加的函数都需要在defs.h中声明一下。同时在这个函数中我们使用了walkaddr来取物理地址，因此也需要把它声明到defs.h中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">// kalloc.c</span><br><span class="line">uint64 cowalloc(pagetable_t pagetable, uint64 va)</span><br><span class="line">&#123;</span><br><span class="line">  if (va % PGSIZE != 0) &#123;</span><br><span class="line">    printf(&quot;cowalloc: va exceeds MAXVA\n&quot;);</span><br><span class="line">    return -1;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">  uint64 pa = walkaddr(pagetable, va);</span><br><span class="line">  if (pa == 0)</span><br><span class="line">    return -1;</span><br><span class="line">    //panic(&quot;cowalloc: pte not exists&quot;); // 这里不能panic，而是返回错误并kill process，否则你的stacktest就会panic</span><br><span class="line">  pte_t* pte = walk(pagetable, va, 0);  </span><br><span class="line"></span><br><span class="line">  if (pte == 0)</span><br><span class="line">    panic(&quot;cowalloc: pte not exists&quot;);</span><br><span class="line">  if ((*pte &amp; PTE_V) == 0 || (*pte &amp; PTE_U) == 0) &#123;</span><br><span class="line">    panic(&quot;cowalloc: pte permission err&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  if (refcnt((void*)pa) == 1) &#123; // 只有一个引用</span><br><span class="line">    *pte |= PTE_W;</span><br><span class="line">    *pte &amp;= ~PTE_F; // 还原标记</span><br><span class="line">    return (uint64)pa;</span><br><span class="line">  &#125; else &#123; // 多个引用</span><br><span class="line">    uint64 mem = (uint64)kalloc();</span><br><span class="line">    if (mem == 0) &#123;</span><br><span class="line">      printf(&quot;cowalloc: kalloc fails\n&quot;);</span><br><span class="line">      return -1;      </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    memmove((void*)mem, (void*)pa, PGSIZE);</span><br><span class="line"></span><br><span class="line">    *pte &amp;= ~PTE_V; // 防止被mappage判定为remap</span><br><span class="line"></span><br><span class="line">    if (mappages(pagetable, va, PGSIZE, mem, (PTE_FLAGS(*pte) | PTE_W) &amp; ~PTE_F) != 0) &#123;</span><br><span class="line">      kfree((void*)mem);</span><br><span class="line">      *pte |= PTE_V;</span><br><span class="line">      return -1;</span><br><span class="line">    &#125;</span><br><span class="line">    kfree((void*)PGROUNDDOWN(pa)); // 引用减一</span><br><span class="line">    return mem;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>我们知道，fork会跳转到uvmcopy来拷贝page，因此在里面我们需要作出修改。每次fork的时候，不需要分配物理page，只需要把parent的flag设好，引用数加一，并添加child的映射就好。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">//vm.c</span><br><span class="line">int</span><br><span class="line">uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)</span><br><span class="line">&#123;</span><br><span class="line">  pte_t *pte;</span><br><span class="line">  uint64 pa, i;</span><br><span class="line">  uint flags;</span><br><span class="line"></span><br><span class="line">  for(i = 0; i &lt; sz; i += PGSIZE)&#123;</span><br><span class="line">    if((pte = walk(old, i, 0)) == 0)</span><br><span class="line">      panic(&quot;uvmcopy: pte should exist&quot;);</span><br><span class="line">    if((*pte &amp; PTE_V) == 0)</span><br><span class="line">      panic(&quot;uvmcopy: page not present&quot;);</span><br><span class="line">    pa = PTE2PA(*pte);</span><br><span class="line">    *pte &amp;= ~PTE_W;</span><br><span class="line">    *pte |= PTE_F;</span><br><span class="line">    flags = PTE_FLAGS(*pte);</span><br><span class="line">    //if((mem = kalloc()) == 0)</span><br><span class="line">    //  goto err;</span><br><span class="line">    //memmove(mem, (char*)pa, PGSIZE);</span><br><span class="line">    if(mappages(new, i, PGSIZE, pa, flags) != 0)&#123;</span><br><span class="line">      //kfree(mem);</span><br><span class="line">      goto err;</span><br><span class="line">    &#125;</span><br><span class="line">    changeref(pa, 1);</span><br><span class="line">  &#125;</span><br><span class="line">  return 0;</span><br><span class="line"></span><br><span class="line"> err:</span><br><span class="line">  uvmunmap(new, 0, i / PGSIZE, 1);</span><br><span class="line">  return -1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>因为page fault会跳转到usertrap，因此我们也需要修改usertrap，方法和lazy如出一辙。注意，在实现cowalloc时，映射错误，请求越界，内存耗尽等错误都会返回-1，这些情况需要立刻kill进程。(但后来仔细想了一下，请求越界是否也可以直接panic呢？)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#125; else if (r_scause() == 15) &#123;</span><br><span class="line">  uint64 fault_va = r_stval();</span><br><span class="line">  if (fault_va &gt;= p-&gt;sz || iscow(p-&gt;pagetable, fault_va) != 0 || cowalloc(p-&gt;pagetable, PGROUNDDOWN(fault_va)) == -1)</span><br><span class="line">    p-&gt;killed = 1;</span><br><span class="line">&#125; else &#123;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>还有一个小问题，当执行copyout时是在kernel中，并不能触发usertrap，因此需要另外处理。这里同样也需要拷贝页面，并需要拿到新分配页面的地址，这也就是为什么我们的cowalloc返回的是一个地址了。而且如果cowalloc出错，返回的是-1，需要与下面的出错判断统一(当然你也可以让它出错返回0，但我懒得改了)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">while(len &gt; 0)&#123;</span><br><span class="line">  va0 = PGROUNDDOWN(dstva);</span><br><span class="line">  pa0 = walkaddr(pagetable, va0);</span><br><span class="line">  if (iscow(pagetable, va0) == 0)&#123;</span><br><span class="line">    pa0 = (uint64)cowalloc(pagetable, va0);</span><br><span class="line">    if (pa0 == -1)</span><br><span class="line">      pa0 = 0;     </span><br><span class="line">  &#125;</span><br><span class="line">  if(pa0 == 0)</span><br><span class="line">    return -1;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>在观摩前人代码时，发现了一个有意思的问题。请回看uvmcopy函数和cowalloc函数，在uvmcopy中，我们并没有判断该page在fork之前是否已经是只读的。如果它是只读的，那经过fork后，它和其他可写page一起被设为了只读的cow page，而在cowalloc中，引用数为1的page会直接标记可写，那么会不会出现不可写的page经过这种操作错误转化成可写page呢？如果要解决的话，我觉得需要用上第二个RSW位特殊记录，但在lab中并没有进行实现，但可以通过所有test，有兴趣者可自行尝试。</p>
+<p>review:</p>
+<p>在复习中，我在xv6 cow中查找了所有关于PTE_V的修改，发现只有在实现cow相关功能时，会出现只读不写的flag，因此在这个单独的修改中直接判断是可行的。基于这个特性，我们在这个lab中甚至可以优化掉PTE_F位，但是一旦加入其他的优化，比如lazy allocation，就需要额外判断。课程中morris老师讲到，在现代操作系统中，不是实现的简单page table，而是模仿page table的数据结构，或许这样就可以避免冲突了。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/03/11/mit%206.s081%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93/" rel="prev" title="6.s081实验总结">
+      <i class="fa fa-chevron-left"></i> 6.s081实验总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20traps/" rel="next" title="Lab Traps">
+      Lab Traps <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Lab-Copy-on-Write-Fork"><span class="nav-number">1.</span> <span class="nav-text">Lab Copy on Write Fork</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.1.</span> <span class="nav-text">一、原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#task-Implement-copy-on-write"><span class="nav-number">1.2.</span> <span class="nav-text">task: Implement copy-on write</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">1.3.</span> <span class="nav-text">后记</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">genesis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2024.02 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">genesis</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">70k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:03</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

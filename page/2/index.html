@@ -22,13 +22,13 @@
 
   <meta property="og:type" content="website">
 <meta property="og:title" content="genesis的空间站">
-<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:url" content="http://example.com/page/2/index.html">
 <meta property="og:site_name" content="genesis的空间站">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="genesis">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/page/2/">
 
 
 <script id="page-configurations">
@@ -170,7 +170,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/%E9%85%8D%E7%BD%AExv6%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E6%8B%BC%E5%87%91%E7%89%88%E6%9C%AC/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20cow/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -184,7 +184,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/03/11/%E9%85%8D%E7%BD%AExv6%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E6%8B%BC%E5%87%91%E7%89%88%E6%9C%AC/" class="post-title-link" itemprop="url">环境配置(上)</a>
+            <a href="/2024/03/11/lab%20cow/" class="post-title-link" itemprop="url">Lab Copy on Write Fork</a>
         </h2>
 
         <div class="post-meta">
@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2024-03-11 17:11:47 / 修改时间：19:42:16" itemprop="dateCreated datePublished" datetime="2024-03-11T17:11:47+08:00">2024-03-11</time>
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:14" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
             </span>
 
           <br>
@@ -204,14 +204,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.7k</span>
+              <span>6.1k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>6 分钟</span>
             </span>
 
         </div>
@@ -223,10 +223,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="注意：请先看完环境配置-下-后再进行操作"><a href="#注意：请先看完环境配置-下-后再进行操作" class="headerlink" title="注意：请先看完环境配置(下)后再进行操作"></a>注意：请先看完环境配置(下)后再进行操作</h2><h2 id="配置xv6的运行环境"><a href="#配置xv6的运行环境" class="headerlink" title="配置xv6的运行环境"></a>配置xv6的运行环境</h2>
+          <h1 id="Lab-Copy-on-Write-Fork"><a href="#Lab-Copy-on-Write-Fork" class="headerlink" title="Lab Copy on Write Fork"></a>Lab Copy on Write Fork</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、原理"><a href="#一、原理" class="headerlink" title="一、原理"></a>一、原理</h3><ol>
+<li>在xv6原始的eager fork中，执行fork会立刻将parent的所有页拷贝一份给child，但有时child会执行exec，然后丢到所有的拷贝，加载exec中的内容。这种重复的拷贝会浪费时空，因此可以进行copy on write fork。
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2024/03/11/%E9%85%8D%E7%BD%AExv6%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E6%8B%BC%E5%87%91%E7%89%88%E6%9C%AC/#more" rel="contents">
+              <a class="btn" href="/2024/03/11/lab%20cow/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -250,7 +251,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20file/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/mit%206.s081%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -264,7 +265,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/03/11/lab%20file/" class="post-title-link" itemprop="url">Lab File</a>
+            <a href="/2024/03/11/mit%206.s081%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">6.s081实验总结</a>
         </h2>
 
         <div class="post-meta">
@@ -275,7 +276,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:12" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:40" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
             </span>
 
           <br>
@@ -284,328 +285,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Lab-File"><a href="#Lab-File" class="headerlink" title="Lab File"></a>Lab File</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、关于inode的结构"><a href="#一、关于inode的结构" class="headerlink" title="一、关于inode的结构"></a>一、关于inode的结构</h3><p>在xv6中，每一个文件(包括文件夹)对应一个inode。一个inode包含13个地址条目。前十二的地址直接指向了十二个数据块，第十三个地址指向了一个间接块，这个间接块储存了256个数据块的地址，每个地址对应一个数据块。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/03/11/lab%20file/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20lazy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="genesis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="genesis的空间站">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/03/11/lab%20lazy/" class="post-title-link" itemprop="url">Lab Lazy</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:11" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>4.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Lab-Lazy"><a href="#Lab-Lazy" class="headerlink" title="Lab Lazy"></a>Lab Lazy</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、原理"><a href="#一、原理" class="headerlink" title="一、原理"></a>一、原理</h3><ol>
-<li>因为绝大多数情况，程序并不会全部使用它一开始申请的内存，所以eager allocation常常会出现浪费，为了避免这种情况，可以使用lazy allocation。
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/03/11/lab%20lazy/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20lock/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="genesis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="genesis的空间站">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/03/11/lab%20lock/" class="post-title-link" itemprop="url">Lab Lock</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:08" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>7.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>7 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Lab-Lock"><a href="#Lab-Lock" class="headerlink" title="Lab Lock"></a>Lab Lock</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、-哈希表-略-，双链表-略"><a href="#一、-哈希表-略-，双链表-略" class="headerlink" title="一、 哈希表(略)，双链表(略)"></a>一、 哈希表(略)，双链表(略)</h3><h3 id="二、-buffer-cache的LRU实现"><a href="#二、-buffer-cache的LRU实现" class="headerlink" title="二、 buffer cache的LRU实现"></a>二、 buffer cache的LRU实现</h3><p>buffer cache是一个双链表。每次新加入一个块，就会把它插到头指针后面，每次需要替换掉一个块，就选择一个头指针前面(也就是最后一个元素)进行替换。每一个块都有一个引用数，代表当前是否有进程在使用它。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/03/11/lab%20lock/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20mmap/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="genesis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="genesis的空间站">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/03/11/lab%20mmap/" class="post-title-link" itemprop="url">Lab Mmap</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:15" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Lab-Mmap"><a href="#Lab-Mmap" class="headerlink" title="Lab Mmap"></a>Lab Mmap</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p>lab lazy, lab file</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/03/11/lab%20mmap/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20net/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="genesis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="genesis的空间站">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/03/11/lab%20net/" class="post-title-link" itemprop="url">Lab Net</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:06" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.6k</span>
+              <span>1.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -624,10 +304,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Lab-Net"><a href="#Lab-Net" class="headerlink" title="Lab Net"></a>Lab Net</h1><h2 id="前置知识-略"><a href="#前置知识-略" class="headerlink" title="前置知识(略)"></a>前置知识(略)</h2><h2 id="Task-Your-Job"><a href="#Task-Your-Job" class="headerlink" title="Task: Your Job"></a>Task: Your Job</h2><p>这个task要求我们补充两个函数。第一个函数是在ring中寻找一个空余位置来放置packet等待传输，第二个函数是遍历整个ring，将传输进来的packet发送给上层协议处理。因为我并没有学过计网，并不十分清楚内部的原理，因此暂时借鉴网友做法，待学成后再作进一步解释和补充。</p>
+          <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>在acm新生赛之后，终于有空来学习一下名震八方的6.s081了。历经3个月时间(其实完全不用这么久，但中间摆了一会儿)，终于基本看完了所有Fall 2020公开课，阅读了xv6 book全文，完成了11个lab，对xv6这个迷你操作系统有了一个初步的认识。现写此总结，以记录我的学习历程。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2024/03/11/lab%20net/#more" rel="contents">
+              <a class="btn" href="/2024/03/11/mit%206.s081%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -651,7 +331,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20page%20table/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/%E9%85%8D%E7%BD%AExv6%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E5%B9%B6%E4%BC%98%E9%9B%85%E5%9C%B0%E4%BD%BF%E7%94%A8vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -665,7 +345,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/03/11/lab%20page%20table/" class="post-title-link" itemprop="url">Lab Page Table</a>
+            <a href="/2024/03/11/%E9%85%8D%E7%BD%AExv6%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E5%B9%B6%E4%BC%98%E9%9B%85%E5%9C%B0%E4%BD%BF%E7%94%A8vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95/" class="post-title-link" itemprop="url">环境配置(下)</a>
         </h2>
 
         <div class="post-meta">
@@ -676,7 +356,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:05" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:18" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
             </span>
 
           <br>
@@ -685,14 +365,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.8k</span>
+              <span>2.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>8 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -704,11 +384,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Lab-Page-Table"><a href="#Lab-Page-Table" class="headerlink" title="Lab Page Table"></a>Lab Page Table</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、xv6三级page-table-原理"><a href="#一、xv6三级page-table-原理" class="headerlink" title="一、xv6三级page table 原理"></a>一、xv6三级page table 原理</h3><ol>
-<li>在xv6 virtual address中，分为index，offset和EXT三部分。其中offset对标最终翻译后的physical address的后十二位，表示当前4096bit大小的page中的偏移量，而index平分为三个9位索引，分别表示三级PTE中的物理地址偏移量。
+          <h3 id="经过无数次尝试和重装，耗时近40个小时，终于探索出一条用vscode调试xv6的可行性道路"><a href="#经过无数次尝试和重装，耗时近40个小时，终于探索出一条用vscode调试xv6的可行性道路" class="headerlink" title="经过无数次尝试和重装，耗时近40个小时，终于探索出一条用vscode调试xv6的可行性道路"></a>经过无数次尝试和重装，耗时近40个小时，终于探索出一条用vscode调试xv6的可行性道路</h3>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2024/03/11/lab%20page%20table/#more" rel="contents">
+              <a class="btn" href="/2024/03/11/%E9%85%8D%E7%BD%AExv6%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E5%B9%B6%E4%BC%98%E9%9B%85%E5%9C%B0%E4%BD%BF%E7%94%A8vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -732,7 +411,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20thread/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/10/%E9%9D%92%E5%B1%B1%EF%BC%88%E4%B8%8B%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -746,7 +425,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/03/11/lab%20thread/" class="post-title-link" itemprop="url">Lab Thread</a>
+            <a href="/2024/02/10/%E9%9D%92%E5%B1%B1%EF%BC%88%E4%B8%8B%EF%BC%89/" class="post-title-link" itemprop="url">青山（下）</a>
         </h2>
 
         <div class="post-meta">
@@ -755,10 +434,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:03" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+              <time title="创建时间：2024-02-10 11:51:21" itemprop="dateCreated datePublished" datetime="2024-02-10T11:51:21+08:00">2024-02-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-03-11 19:39:38" itemprop="dateModified" datetime="2024-03-11T19:39:38+08:00">2024-03-11</time>
+              </span>
 
           <br>
             <span class="post-meta-item" title="本文字数">
@@ -766,14 +451,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.9k</span>
+              <span>7.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
+              <span>7 分钟</span>
             </span>
 
         </div>
@@ -785,10 +470,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Lab-Thread"><a href="#Lab-Thread" class="headerlink" title="Lab Thread"></a>Lab Thread</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、进程切换中的状态保存"><a href="#一、进程切换中的状态保存" class="headerlink" title="一、进程切换中的状态保存"></a>一、进程切换中的状态保存</h3><p>在常规的强制进程切换时，需要kernel的调配。所以需要先切换到内核态，然后通过scheduler函数来切换到目标进程对应的内核态，然后再切换到user。在这个过程中，进程的切换需要保存的是context，而user和kernel的切换需要保存的是trapframe。</p>
+          <h2 id="青山（下）"><a href="#青山（下）" class="headerlink" title="青山（下）"></a>青山（下）</h2><h3 id="漫漫长夜"><a href="#漫漫长夜" class="headerlink" title="漫漫长夜"></a>漫漫长夜</h3><p>&emsp;&emsp;随着一阵推进器的轰鸣声,穿梭机搭载着十几位科研人员出发了。淡蓝色的尾焰划过空寂的天空,好似高天的一滴眼泪。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2024/03/11/lab%20thread/#more" rel="contents">
+              <a class="btn" href="/2024/02/10/%E9%9D%92%E5%B1%B1%EF%BC%88%E4%B8%8B%EF%BC%89/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -812,7 +497,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20syscall/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/09/%E9%9D%92%E5%B1%B1%EF%BC%88%E4%B8%8A%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -826,7 +511,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/03/11/lab%20syscall/" class="post-title-link" itemprop="url">Lab Syscall</a>
+            <a href="/2024/02/09/%E9%9D%92%E5%B1%B1%EF%BC%88%E4%B8%8A%EF%BC%89/" class="post-title-link" itemprop="url">青山（上）</a>
         </h2>
 
         <div class="post-meta">
@@ -835,10 +520,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:04" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+              <time title="创建时间：2024-02-09 23:53:31" itemprop="dateCreated datePublished" datetime="2024-02-09T23:53:31+08:00">2024-02-09</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-03-11 19:39:31" itemprop="dateModified" datetime="2024-03-11T19:39:31+08:00">2024-03-11</time>
+              </span>
 
           <br>
             <span class="post-meta-item" title="本文字数">
@@ -846,14 +537,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5.4k</span>
+              <span>4.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
+              <span>4 分钟</span>
             </span>
 
         </div>
@@ -865,11 +556,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Lab-Syscall"><a href="#Lab-Syscall" class="headerlink" title="Lab Syscall"></a>Lab Syscall</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、添加一个syscall的流程"><a href="#一、添加一个syscall的流程" class="headerlink" title="一、添加一个syscall的流程"></a>一、添加一个syscall的流程</h3><ol>
-<li>当你想要添加编译一个user下的源文件，你需要把它加到Makefile中
+          <h2 id="青-山①（上）"><a href="#青-山①（上）" class="headerlink" title="青  山①（上）"></a>青  山①（上）</h2><h3 id="撤离"><a href="#撤离" class="headerlink" title="撤离"></a>撤离</h3><p>&emsp;&emsp;郑守峰推开气闸门，映入眼帘的便是那座灰色的山峰。布满棱角的怪石杂乱地堆放在一起，几棵扫把②孤零零地立在山坡上，将枯黑的枝干伸向天空。“是山啊。”他自言自语道。他的思绪飘向了远方。记忆中故乡的青山与眼前的石山重叠起来。“我已经多久没看到青山了？”他自问道。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2024/03/11/lab%20syscall/#more" rel="contents">
+              <a class="btn" href="/2024/02/09/%E9%9D%92%E5%B1%B1%EF%BC%88%E4%B8%8A%EF%BC%89/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -893,7 +583,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20traps/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/01/test/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -907,7 +597,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2024/03/11/lab%20traps/" class="post-title-link" itemprop="url">Lab Traps</a>
+            <a href="/2024/02/01/test/" class="post-title-link" itemprop="url">test</a>
         </h2>
 
         <div class="post-meta">
@@ -918,7 +608,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:32" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+              <time title="创建时间：2024-02-01 23:34:13 / 修改时间：23:56:32" itemprop="dateCreated datePublished" datetime="2024-02-01T23:34:13+08:00">2024-02-01</time>
             </span>
 
           <br>
@@ -927,14 +617,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.7k</span>
+              <span>25</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -946,16 +636,91 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Lab-Traps"><a href="#Lab-Traps" class="headerlink" title="Lab Traps"></a>Lab Traps</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、stack"><a href="#一、stack" class="headerlink" title="一、stack"></a>一、stack</h3><ol>
-<li>stack储存方式和heap相反，它是向下增长的，有两个重要的寄存器，fp和sp。fp指向当前frame的顶(上)，sp指向的是当前frame的底(下)。
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/03/11/lab%20traps/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
+          <h3 id="Hopefully-it-will-work-well"><a href="#Hopefully-it-will-work-well" class="headerlink" title="Hopefully, it will work well."></a>Hopefully, it will work well.</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/01/hello-world/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="genesis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="genesis的空间站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/02/01/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-02-01 17:40:39" itemprop="dateCreated datePublished" datetime="2024-02-01T17:40:39+08:00">2024-02-01</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>367</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+
       
     </div>
 
@@ -973,7 +738,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
   </nav>
 
 

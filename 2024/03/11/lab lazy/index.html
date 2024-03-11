@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Lab Lazy前置知识一、原理 因为绝大多数情况，程序并不会全部使用它一开始申请的内存，所以eager allocation常常会出现浪费，为了避免这种情况，可以使用lazy allocation。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lab Lazy">
+<meta property="og:url" content="http://example.com/2024/03/11/lab%20lazy/index.html">
+<meta property="og:site_name" content="genesis的空间站">
+<meta property="og:description" content="Lab Lazy前置知识一、原理 因为绝大多数情况，程序并不会全部使用它一开始申请的内存，所以eager allocation常常会出现浪费，为了避免这种情况，可以使用lazy allocation。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-11T09:06:29.108Z">
+<meta property="article:modified_time" content="2024-03-11T11:42:11.375Z">
+<meta property="article:author" content="genesis">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/03/11/lab%20lazy/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Lab Lazy | genesis的空间站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">genesis的空间站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-learn">
+
+    <a href="/learn/ln.html" rel="section"><i class="fa fa-cog fa-fw"></i>路漫漫</a>
+
+  </li>
+        <li class="menu-item menu-item-think">
+
+    <a href="/think/" rel="section"><i class="fa fa-snowflake fa-fw"></i>朝闻道</a>
+
+  </li>
+        <li class="menu-item menu-item-write">
+
+    <a href="/write/wt.html" rel="section"><i class="fa fa-ring fa-fw"></i>新世界</a>
+
+  </li>
+        <li class="menu-item menu-item-nothing">
+
+    <a href="/nothing/nt.html" rel="section"><i class="fa fa-fan fa-fw"></i>览星海</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/lab%20lazy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="genesis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="genesis的空间站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lab Lazy
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:11" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Lab-Lazy"><a href="#Lab-Lazy" class="headerlink" title="Lab Lazy"></a>Lab Lazy</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="一、原理"><a href="#一、原理" class="headerlink" title="一、原理"></a>一、原理</h3><ol>
+<li>因为绝大多数情况，程序并不会全部使用它一开始申请的内存，所以eager allocation常常会出现浪费，为了避免这种情况，可以使用lazy allocation。<span id="more"></span></li>
+<li>在lazy allocation中，每次程序申请page的时候，并不会直接给它分配page，而是表面上给它在列表中分配相应虚拟page，但并不给它分配实际物理page。这样，当程序使用这个page时，一定会发生找不到物理page的page fault。此时便可以分配page了。</li>
+</ol>
+<h2 id="task-Eliminate-allocation-from-sbrk"><a href="#task-Eliminate-allocation-from-sbrk" class="headerlink" title="task: Eliminate allocation from sbrk"></a>task: Eliminate allocation from sbrk</h2><ol>
+<li>这是一个很简单的task，只需要实现sbrk中只增加sz不分配page的操作就好了。</li>
+<li>因为后续task会增加更多的限制，不妨在这里就先考虑周全。</li>
+<li>首先，n可正可负，当n为负数时，需要释放page</li>
+<li>其次，sz在变化n后，不能超过堆顶MAXVA，也不能把不属于该进程的负数区释放掉<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">//sysproc.c</span><br><span class="line">uint64</span><br><span class="line">sys_sbrk(void)</span><br><span class="line">&#123;</span><br><span class="line">  int addr;</span><br><span class="line">  int n;</span><br><span class="line"></span><br><span class="line">  if(argint(0, &amp;n) &lt; 0)</span><br><span class="line">    return -1;</span><br><span class="line">  struct proc *p = myproc();</span><br><span class="line">  addr = p-&gt;sz;</span><br><span class="line">//  if(growproc(n) &lt; 0)</span><br><span class="line">//    return -1;</span><br><span class="line">  if (p-&gt;sz + n &lt; 0 || p-&gt;sz + n &gt; MAXVA)//是否在堆中</span><br><span class="line">    return -1;</span><br><span class="line">  if (n &lt; 0) &#123;</span><br><span class="line">    uvmdealloc(p-&gt;pagetable, p-&gt;sz, p-&gt;sz + n);</span><br><span class="line">  &#125;</span><br><span class="line">  p-&gt;sz += n;</span><br><span class="line">  return addr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="task-Lazy-allocation"><a href="#task-Lazy-allocation" class="headerlink" title="task: Lazy allocation"></a>task: Lazy allocation</h2><ol>
+<li>在上一个task，我们只修改了sz，并没有真正分配物理页，因此首先需要在page fault跳转到的usertrap中分配page。注意，从xv6book中我们可以知道，只有load和store page fault的出现才意味着lazy需要allocation</li>
+<li>在这个lab中，无论是内存耗尽还是映射失败，都需要立刻kill进程<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">//trap.c/ usertrap()</span><br><span class="line">...</span><br><span class="line"> else if((which_dev = devintr()) != 0)&#123;</span><br><span class="line">    // ok</span><br><span class="line">  &#125; else if ((r_scause() == 13) || (r_scause() == 15)) &#123;//load 13; store 15</span><br><span class="line">    // 返回出错的虚拟地址</span><br><span class="line">    uint64 va = r_stval();</span><br><span class="line">    // 不能添加printf, 否则答案不正确</span><br><span class="line">    if ((va &gt;= p-&gt;sz) || (va &lt; p-&gt;trapframe-&gt;sp)) &#123;//越过了申请页表的指针或不在堆的范围内</span><br><span class="line">      p-&gt;killed = 1;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      uint64 ka = (uint64) kalloc();</span><br><span class="line">      if (ka == 0) &#123;//物理page申请失败</span><br><span class="line">        p-&gt;killed = 1;</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        memset((void*)ka, 0, PGSIZE);</span><br><span class="line">        va = PGROUNDDOWN(va);//page取整</span><br><span class="line">        if(mappages(p-&gt;pagetable, va, PGSIZE, ka, PTE_W|PTE_R|PTE_U) != 0) &#123;//映射失败</span><br><span class="line">          kfree((void*)ka);</span><br><span class="line">          p-&gt;killed = 1;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    printf(&quot;usertrap(): unexpected scause %p pid=%d\n&quot;, r_scause(), p-&gt;pid);</span><br><span class="line">    printf(&quot;            sepc=%p stval=%p\n&quot;, r_sepc(), r_stval());</span><br><span class="line">    p-&gt;killed = 1;</span><br><span class="line">  &#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
+<li>这时候，echo hi 会报panic，这是因为在没有lazy的xv6中，取消映射一个没有分配物理地址的page或者一个没有映射的页表显然是不合法的，但是加上lazy后，这些情况便会出现在lazy中，(比如，你增加了sz却没有分配page，最后释放的这些假page一定没有物理地址)，因此我们需要取消这些panic生成。注意，头文件该加就加，小心顺序<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//vm.c/ uvmunmap()</span><br><span class="line">...</span><br><span class="line">  for(a = va; a &lt; va + npages*PGSIZE; a += PGSIZE)&#123;</span><br><span class="line">    if((pte = walk(pagetable, a, 0)) == 0)</span><br><span class="line">      continue;</span><br><span class="line">      //panic(&quot;uvmunmap: walk&quot;);</span><br><span class="line">    if((*pte &amp; PTE_V) == 0)</span><br><span class="line">      continue;//just ok</span><br><span class="line">//      panic(&quot;uvmunmap: not mapped&quot;);</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
+<li>关于为何需要continue walk出错后还需要continue页表无效，可以看到walk函数的实现，for循环中只循环前两层页表，因此当前两层页表索引出现无效时会返回0，但是它不会检查最后一层指向的PTE是否无效而是会直接返回，因此需要做两层检查。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">//walk</span><br><span class="line">pte_t *</span><br><span class="line">walk(pagetable_t pagetable, uint64 va, int alloc)</span><br><span class="line">&#123;</span><br><span class="line">  if(va &gt;= MAXVA)</span><br><span class="line">    panic(&quot;walk&quot;);</span><br><span class="line"></span><br><span class="line">  for(int level = 2; level &gt; 0; level--) &#123;//2 level</span><br><span class="line">    pte_t *pte = &amp;pagetable[PX(level, va)];</span><br><span class="line">    if(*pte &amp; PTE_V) &#123;</span><br><span class="line">      pagetable = (pagetable_t)PTE2PA(*pte);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      if(!alloc || (pagetable = (pde_t*)kalloc()) == 0)</span><br><span class="line">        return 0;</span><br><span class="line">      memset(pagetable, 0, PGSIZE);</span><br><span class="line">      *pte = PA2PTE(pagetable) | PTE_V;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return &amp;pagetable[PX(0, va)];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="Task-Lazytests-and-Usertests"><a href="#Task-Lazytests-and-Usertests" class="headerlink" title="Task: Lazytests and Usertests"></a>Task: Lazytests and Usertests</h2><ol>
+<li>当我们调用fork函数时，在将parent页表拷贝给child时，当遇到和uvmunmap中的“假page”的时候，不需要拷贝，也不能触发panic，直接跳过就好。因为你会发现如果继续执行的话，uvmcopy函数会为child的”假page”分配物理页，这显然是不对的。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">//vm.c/ uvmcopy()</span><br><span class="line">  for(i = 0; i &lt; sz; i += PGSIZE)&#123;</span><br><span class="line">    if((pte = walk(old, i, 0)) == 0)</span><br><span class="line">      continue;</span><br><span class="line">      //panic(&quot;uvmcopy: pte should exist&quot;);</span><br><span class="line">    if((*pte &amp; PTE_V) == 0)</span><br><span class="line">      continue;</span><br><span class="line">      //panic(&quot;uvmcopy: page not present&quot;);</span><br><span class="line">    pa = PTE2PA(*pte);</span><br><span class="line">    flags = PTE_FLAGS(*pte);</span><br><span class="line">    if((mem = kalloc()) == 0)//this is why we continue</span><br><span class="line">      goto err;</span><br><span class="line">    memmove(mem, (char*)pa, PGSIZE);</span><br><span class="line">    if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0)&#123;</span><br><span class="line">      kfree(mem);</span><br><span class="line">      goto err;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return 0;</span><br></pre></td></tr></table></figure></li>
+<li>最后，在调用syscall read, write时，会进入到kernel中，此时不能直接使用user虚拟地址，需要通过walkaddr函数来模拟一个MMU，此时如果找到一个没有被分配物理页的page，那么就给它分配一个。注意，按理说，sys_read()-&gt;readi()-&gt;either_copyout()-&gt;copyout()-&gt;walkaddr(),因此可以修改walkaddr，也可以修改copyout和copyin，我尝试修改walkaddr，但不知为何usertests不过，后来只能退而求其次。(难道是没有及时kill进程吗，等有空了试试)<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">//vm.c/ copyin(),copyout()</span><br><span class="line">  while(len &gt; 0)&#123;</span><br><span class="line">    va0 = PGROUNDDOWN(dstva);</span><br><span class="line">    pa0 = walkaddr(pagetable, va0);</span><br><span class="line">    if (pa0 == 0) &#123;</span><br><span class="line">      if ((va0 &gt;= p-&gt;sz) || (va0 &lt; p-&gt;trapframe-&gt;sp)) &#123;</span><br><span class="line">        return -1;</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        pa0 = (uint64)kalloc();</span><br><span class="line">        if (pa0 == 0) &#123;</span><br><span class="line">          p-&gt;killed = 1;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          memset((void *)pa0, 0, PGSIZE);</span><br><span class="line">          va0 = PGROUNDDOWN(va0);</span><br><span class="line">          if(mappages(p-&gt;pagetable, va0, PGSIZE, pa0, PTE_W|PTE_R|PTE_U) != 0) &#123;</span><br><span class="line">            kfree((void *)pa0);</span><br><span class="line">            p-&gt;killed = 1;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20lock/" rel="prev" title="Lab Lock">
+      <i class="fa fa-chevron-left"></i> Lab Lock
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20file/" rel="next" title="Lab File">
+      Lab File <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Lab-Lazy"><span class="nav-number">1.</span> <span class="nav-text">Lab Lazy</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.1.</span> <span class="nav-text">一、原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#task-Eliminate-allocation-from-sbrk"><span class="nav-number">1.2.</span> <span class="nav-text">task: Eliminate allocation from sbrk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#task-Lazy-allocation"><span class="nav-number">1.3.</span> <span class="nav-text">task: Lazy allocation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-Lazytests-and-Usertests"><span class="nav-number">1.4.</span> <span class="nav-text">Task: Lazytests and Usertests</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">genesis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2024.02 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">genesis</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">70k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:03</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="引言在acm新生赛之后，终于有空来学习一下名震八方的6.s081了。历经3个月时间(其实完全不用这么久，但中间摆了一会儿)，终于基本看完了所有Fall 2020公开课，阅读了xv6 book全文，完成了11个lab，对xv6这个迷你操作系统有了一个初步的认识。现写此总结，以记录我的学习历程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6.s081实验总结">
+<meta property="og:url" content="http://example.com/2024/03/11/mit%206.s081%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="genesis的空间站">
+<meta property="og:description" content="引言在acm新生赛之后，终于有空来学习一下名震八方的6.s081了。历经3个月时间(其实完全不用这么久，但中间摆了一会儿)，终于基本看完了所有Fall 2020公开课，阅读了xv6 book全文，完成了11个lab，对xv6这个迷你操作系统有了一个初步的认识。现写此总结，以记录我的学习历程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-11T09:06:29.093Z">
+<meta property="article:modified_time" content="2024-03-11T11:42:40.036Z">
+<meta property="article:author" content="genesis">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/03/11/mit%206.s081%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>6.s081实验总结 | genesis的空间站</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">genesis的空间站</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-learn">
+
+    <a href="/learn/ln.html" rel="section"><i class="fa fa-cog fa-fw"></i>路漫漫</a>
+
+  </li>
+        <li class="menu-item menu-item-think">
+
+    <a href="/think/" rel="section"><i class="fa fa-snowflake fa-fw"></i>朝闻道</a>
+
+  </li>
+        <li class="menu-item menu-item-write">
+
+    <a href="/write/wt.html" rel="section"><i class="fa fa-ring fa-fw"></i>新世界</a>
+
+  </li>
+        <li class="menu-item menu-item-nothing">
+
+    <a href="/nothing/nt.html" rel="section"><i class="fa fa-fan fa-fw"></i>览星海</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/mit%206.s081%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="genesis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="genesis的空间站">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          6.s081实验总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-03-11 17:06:29 / 修改时间：19:42:40" itemprop="dateCreated datePublished" datetime="2024-03-11T17:06:29+08:00">2024-03-11</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>在acm新生赛之后，终于有空来学习一下名震八方的6.s081了。历经3个月时间(其实完全不用这么久，但中间摆了一会儿)，终于基本看完了所有Fall 2020公开课，阅读了xv6 book全文，完成了11个lab，对xv6这个迷你操作系统有了一个初步的认识。现写此总结，以记录我的学习历程。</p>
+<span id="more"></span>
+
+<p>我的实验仓库： <a target="_blank" rel="noopener" href="https://github.com/Lifelong-journey/xv6-lab">https://github.com/Lifelong-journey/xv6-lab</a> </p>
+<h1 id="课程与实验概述"><a href="#课程与实验概述" class="headerlink" title="课程与实验概述"></a>课程与实验概述</h1><p>该课程分为两部分，前一部分紧密结合xv6讲解其原理，后一部分以阅读paper为主讲解现代操作系统的优化策略。每节课前需要阅读相应的book章节或者paper，否则很难跟上教授的思路。</p>
+<p>实验和公开课，book密切相关，通常在实验手册中有充足的提示，但有些实验的确非常难以独立实现，网上有许多实验记录，可以适当借鉴。</p>
+<p>如果想要学习该课程，只有c基础语法是必要的，其他锦上添花的知识包括csapp，汇编基础，操作系统概论等等。</p>
+<h1 id="实验建议与说明"><a href="#实验建议与说明" class="headerlink" title="实验建议与说明"></a>实验建议与说明</h1><ol>
+<li>该课程的实验并不是从0开始写一个操作系统，而是给原始的xv6添加功能和实现优化，代码量不大，只有大概2k行左右。</li>
+<li>该课程有11个实验，但每个实验并不是在前一个实验的基础上开发，而是给你一个全新的原始xv6系统。这是因为从lab 3加入独立内核页表以后，想要兼容后继实验变得异常困难。网络上最多只能找到兼容到lab lazy的实现。</li>
+<li>Fall 2020中某些实验的难度系数很大，例如lab 3。不过这些实验在2021课程中完全消失了。</li>
+<li>有些实验在make grade的时候会超时，如果是在虚拟机上跑的话可以适当修改时限。</li>
+<li>多阅读源码是必要的。</li>
+</ol>
+<h1 id="实验记录导航"><a href="#实验记录导航" class="headerlink" title="实验记录导航"></a>实验记录导航</h1><h3 id="环境配置-上"><a href="#环境配置-上" class="headerlink" title="环境配置(上)"></a>环境配置(上)</h3><h3 id="环境配置-下"><a href="#环境配置-下" class="headerlink" title="环境配置(下)"></a>环境配置(下)</h3><h3 id="Lab2-System-calls"><a href="#Lab2-System-calls" class="headerlink" title="Lab2: System calls"></a>Lab2: System calls</h3><h3 id="Lab3-Page-tables"><a href="#Lab3-Page-tables" class="headerlink" title="Lab3: Page tables"></a>Lab3: Page tables</h3><h3 id="Lab4-Traps"><a href="#Lab4-Traps" class="headerlink" title="Lab4: Traps"></a>Lab4: Traps</h3><h3 id="Lab5-Lazy-allocation"><a href="#Lab5-Lazy-allocation" class="headerlink" title="Lab5: Lazy allocation"></a>Lab5: Lazy allocation</h3><h3 id="Lab6-Copy-on-write"><a href="#Lab6-Copy-on-write" class="headerlink" title="Lab6: Copy on-write"></a>Lab6: Copy on-write</h3><h3 id="Lab7-Multithreading"><a href="#Lab7-Multithreading" class="headerlink" title="Lab7: Multithreading"></a>Lab7: Multithreading</h3><h3 id="Lab8-Lock"><a href="#Lab8-Lock" class="headerlink" title="Lab8: Lock"></a>Lab8: Lock</h3><h3 id="Lab9-File-system"><a href="#Lab9-File-system" class="headerlink" title="Lab9: File system"></a>Lab9: File system</h3><h3 id="Lab10-mmap"><a href="#Lab10-mmap" class="headerlink" title="Lab10: mmap"></a>Lab10: mmap</h3><h3 id="Lab11-network-driver"><a href="#Lab11-network-driver" class="headerlink" title="Lab11: network driver"></a>Lab11: network driver</h3><h1 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h1><p>lab util比较简单，因此没有实验记录。同时因为做这个实验的时候第一次用git，没有保存，因此git仓库中没有此实验的源码。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>课程网址：</p>
+<p><a target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.828/2020/tools.html">https://pdos.csail.mit.edu/6.828/2020/tools.html</a></p>
+<p>book翻译：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/FrankZn/xv6-riscv-book-Chinese/tree/main">https://github.com/FrankZn/xv6-riscv-book-Chinese/tree/main</a> (但是还是建议阅读原著)</p>
+<p>课程文字再现：</p>
+<p><a target="_blank" rel="noopener" href="https://mit-public-courses-cn-translatio.gitbook.io/mit6-s081/">https://mit-public-courses-cn-translatio.gitbook.io/mit6-s081/</a></p>
+<p>优雅而简洁的实验再现：</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/632281381">https://zhuanlan.zhihu.com/p/632281381</a></p>
+<p><a target="_blank" rel="noopener" href="https://xv6.dgs.zone/">https://xv6.dgs.zone/</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/03/11/%E9%85%8D%E7%BD%AExv6%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E5%B9%B6%E4%BC%98%E9%9B%85%E5%9C%B0%E4%BD%BF%E7%94%A8vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95/" rel="prev" title="环境配置(下)">
+      <i class="fa fa-chevron-left"></i> 环境配置(下)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/03/11/lab%20cow/" rel="next" title="Lab Copy on Write Fork">
+      Lab Copy on Write Fork <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%BE%E7%A8%8B%E4%B8%8E%E5%AE%9E%E9%AA%8C%E6%A6%82%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">课程与实验概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E5%BB%BA%E8%AE%AE%E4%B8%8E%E8%AF%B4%E6%98%8E"><span class="nav-number">3.</span> <span class="nav-text">实验建议与说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%B0%E5%BD%95%E5%AF%BC%E8%88%AA"><span class="nav-number">4.</span> <span class="nav-text">实验记录导航</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE-%E4%B8%8A"><span class="nav-number">4.0.1.</span> <span class="nav-text">环境配置(上)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE-%E4%B8%8B"><span class="nav-number">4.0.2.</span> <span class="nav-text">环境配置(下)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab2-System-calls"><span class="nav-number">4.0.3.</span> <span class="nav-text">Lab2: System calls</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab3-Page-tables"><span class="nav-number">4.0.4.</span> <span class="nav-text">Lab3: Page tables</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab4-Traps"><span class="nav-number">4.0.5.</span> <span class="nav-text">Lab4: Traps</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab5-Lazy-allocation"><span class="nav-number">4.0.6.</span> <span class="nav-text">Lab5: Lazy allocation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab6-Copy-on-write"><span class="nav-number">4.0.7.</span> <span class="nav-text">Lab6: Copy on-write</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab7-Multithreading"><span class="nav-number">4.0.8.</span> <span class="nav-text">Lab7: Multithreading</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab8-Lock"><span class="nav-number">4.0.9.</span> <span class="nav-text">Lab8: Lock</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab9-File-system"><span class="nav-number">4.0.10.</span> <span class="nav-text">Lab9: File system</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab10-mmap"><span class="nav-number">4.0.11.</span> <span class="nav-text">Lab10: mmap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lab11-network-driver"><span class="nav-number">4.0.12.</span> <span class="nav-text">Lab11: network driver</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%87%E6%B3%A8"><span class="nav-number">5.</span> <span class="nav-text">备注</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">genesis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2024.02 – 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">genesis</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">70k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">1:03</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
